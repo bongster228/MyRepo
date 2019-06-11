@@ -18,7 +18,7 @@ res8: 	0x600270:	714
 rem8: 	0x600272:	5
 
 display doubleword variables 
-num5: 	0x600274:	100007
+num5: 	0x600274:	10b0007
 num6: 	0x600278:	1501
 res9: 	0x60027c:	101508
 res10: 	0x600280:	98506
