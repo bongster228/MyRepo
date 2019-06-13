@@ -50,7 +50,7 @@ fourPi		dd	12.56636
 qVar1		dq	134278427262
 myClass		db	"CS 218", NULL
 edName		db	"Ed Jorgensen", NULL
-myName		db	"your name goes here", NULL
+myName		db	"Bong Lee", NULL
 
 
 ; *****************************************************************
