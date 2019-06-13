@@ -181,7 +181,9 @@ _start:
 
 ;	bans3 = bnum3 + bnum1
 
-
+    mov al, byte[bNum3]
+    add al, byte[bNum1]
+    mov byte[bAns3], al
 
 ; -----
 ;  signed byte additions
@@ -193,7 +195,9 @@ _start:
 
 ;	bans5 = bnum6 + bnum5
 
-
+    mov al, byte[bNum6]
+    add al, byte[bNum5]
+    mov byte[bAns5], al
 
 ; -----
 ;  unsigned byte subtractions
@@ -211,6 +215,9 @@ _start:
 
 ;	bans8 = bnum4 - bnum3
 
+    mov al, byte[bNum4]
+    sub al, byte[bNum3]
+    mov byte[bAns8], al
 
 ; -----
 ;  signed byte subtraction
@@ -222,6 +229,9 @@ _start:
 
 ;	bans10 = bnum6 - bnum5
 
+    mov al, byte[bNum6]
+    sub al, byte[bNum5]
+    mov byte[bAns10], al
 
 
 ; -----
@@ -240,7 +250,9 @@ _start:
 
 ;	wans13 = bnum3 * bnum2
 
-
+    mov al, byte[bNum3]
+    mul byte[bNum2]
+    mov word[wAns13], ax
 
 ; -----
 ;  signed byte multiplication
@@ -252,7 +264,9 @@ _start:
 
 ;	wans15 = bnum5 * bnum6
 
-
+    mov al, byte[bNum5]
+    imul byte[bNum6]
+    mov word[wAns15], ax
 
 ; -----
 ;  unsigned byte division
@@ -280,9 +294,7 @@ _start:
 
     mov ax, word[wNum2]
     div byte[bNum3]
-    mov byte[rem18], ah
-
-
+    mov byte[bRem18], ah
 
 ; -----
 ;  signed byte division
@@ -294,8 +306,23 @@ _start:
     mov byte[bAns19], al
 
 ;	bans20 = bnum6 / bnum5
+
+    mov al, byte[bNum6]
+    cbw
+    idiv byte[bNum5]
+    mov byte[bAns20], al
+
 ;	bans21 = wmum4 / bnum1
+
+    mov ax, word[wNum4]
+    idiv byte[bNum1]
+    mov byte[bAns21], al
+
 ;	brem21 = modulus (wnum4 / bnum1)
+
+    mov ax, word[wNum4]
+    idiv byte[bNum1]
+    mov byte[bRem21], ah
 
 
 
@@ -363,7 +390,10 @@ _start:
 
 ;	dans15 = wnum4 * wnum5
 
-
+    mov ax, word[wNum4]
+    imul word[wNum5]
+    mov word[dAns15], ax
+    mov word[dAns15+2], dx
 
 ; -----
 ;  unsigned word division
@@ -418,7 +448,7 @@ _start:
 ;	dans6 = dnum3 - dnum2
 
     mov eax, dword[dNum3]
-    sub dword[dNum2]
+    sub eax, dword[dNum2]
     mov dword[dAns6], eax
 
 ;	dans7 = dnum1 - dnum4
