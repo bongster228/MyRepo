@@ -271,13 +271,28 @@ _start:
     mov byte[bAns17], al
 
 ;	bans18 = wnum2 / bnum3 
+
+    mov ax, word[wNum2]
+    div byte[bNum3]
+    mov byte[bAns18], al
+
 ;	brem18 = modulus (wnum2 / bnum3) 
+
+    mov ax, word[wNum2]
+    div byte[bNum3]
+    mov byte[rem18], ah
 
 
 
 ; -----
 ;  signed byte division
 ;	bans19 = bnum6 / bnum3
+
+    mov al, byte[bNum6]
+    cbw
+    idiv byte[bNum3]
+    mov byte[bAns19], al
+
 ;	bans20 = bnum6 / bnum5
 ;	bans21 = wmum4 / bnum1
 ;	brem21 = modulus (wnum4 / bnum1)
@@ -368,6 +383,12 @@ _start:
 ; -----
 ;  signed word division
 ;	wans19 = wnum5 / wnum6
+
+    mov ax, word[wNum5]
+    cwd
+    idiv word[wNum6]
+    mov word[wAns19], ax
+
 ;	wans20 = wnum4 / wnum2
 ;	wans21 = dnum2 / wnum3 
 ;	wrem21 = modulus (dnum2 / wnum3)
@@ -481,6 +502,11 @@ _start:
 ; -----
 ;  unsigned quadword additions
 ;	qAns1  = qNum1 + qNum3
+
+    mov rax, qword[qNum1]
+    add rax, qword[qNum3]
+    mov qword[qAns1], rax
+
 ;	qAns2  = qNum2 + qNum4
 ;	qAns3  = qNum3 + qNum2
 
@@ -489,6 +515,11 @@ _start:
 ; -----
 ;  signed quadword additions
 ;	qAns4  = qNum2 + qNum5
+
+    mov rax, qword[qNum2]
+    add rax, qword[qNum5]
+    mov qword[qAns4], rax
+
 ;	qAns5  = qNum6 + qNum5
 
 
@@ -511,6 +542,12 @@ _start:
 ; -----
 ;  unsigned quadword multiplication
 ;	dqAns11  = qNum4 * qNum2
+
+    mov rax, qword[qNum4]
+    mul qword[qNum2]
+    mov qword[dqAns11], rax
+    mov qword[dqAns11+8], rdx
+
 ;	dqAns12  = qNum2 * qNum3
 ;	dqAns13  = qNum3 * qNum1
 
@@ -532,7 +569,19 @@ _start:
 ; -----
 ;  unsigned quadword division
 ;	qAns16 = qNum2 / qNum3
+
+    mov rax, qword[qNum2]
+    mov rdx, 0
+    div qword[qNum3]
+    mov qword[qAns16], rax
+
 ;	qAns17 = qNum3 / qNum4
+
+    mov rax, qword[qNum3]
+    mov rdx, 0
+    div qword[qNum4]
+    mov qword[qAns17], rax
+
 ;	qAns18 = dqAns13 / qNum2
 ;	qRem18 = dqAns13 % qNum2
 
@@ -541,6 +590,12 @@ _start:
 ; -----
 ;  signed quadword division
 ;	qAns19 = qNum5 / qNum6
+
+    mov rax, qword[qNum5]
+    cqo
+    idiv qword[qNum6]
+    mov qword[qAns19], rax
+
 ;	qAns20 = qNum3 / qNum6
 ;	qAns21 = dqAns12 / qNum5
 ;	qRem21 = dqAns12 % qNum5
