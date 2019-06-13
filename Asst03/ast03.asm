@@ -332,32 +332,70 @@ _start:
 ; -----
 ;  unsigned word additions
 ;	wans1 = wnum1 + wnum4
+
+    mov ax, word[wNum1]
+    add ax, word[wNum4]
+    mov word[wAns1], ax
+
 ;	wans2 = wnum2 + wnum3
+
+    mov ax, word[wNum2]
+    add ax, word[wNum3]
+    mov word[wAns2], ax
+
 ;	wans3 = wnum2 + wnum4
 
-
+    mov r8w, word[wNum2]
+    add r8w, word[wNum4]
+    mov word[wAns3], r8w
 
 ; -----
 ;  signed word additions
 ;	wans4 = wnum5 + wnum6
+
+    mov r8w, word[wNum5]
+    add r8w, word[wNum6]
+    mov word[wAns4], r8w
+
 ;	wans5 = wnum6 + wnum4
 
-
+    mov si, word[wNum6]
+    add si, word[wNum4]
+    mov word[wAns5], si
 
 ; -----
 ;  unsigned word subtractions
 ;	wans6 = wnum3 - wnum2
+
+    mov di, word[wNum3]
+    sub di, word[wNum2]
+    mov word[wAns6], di
+
 ;	wans7 = wnum4 - wnum2
+
+    mov r9w, word[wNum4]
+    sub r9w, word[wNum2]
+    mov word[wAns7], r9w
+
 ;	wans8 = wnum2 - wnum4
 
-
+    mov si, word[wNum2]
+    sub si, word[wNum4]
+    mov word[wAns8], si
 
 ; -----
 ;  signed word subtraction
 ;	wans9 = wnum6 - wnum4
+
+    mov ax, word[wNum6]
+    sub ax, word[wNum4]
+    mov word[wAns9], ax
+
 ;	wans10 = wnum5 - wnum6
 
-
+    mov cx, word[wNum5]
+    sub cx, word[wNum6]
+    mov word[wAns10], cx
 
 ; -----
 ;  unsigned word multiplication
@@ -377,7 +415,10 @@ _start:
 
 ;	dans13 = wnum1 * wnum3
 
-
+    mov ax, word[wNum1]
+    mul word[wNum3]
+    mov word[dAns13], ax
+    mov word[dAns13 + 2], dx
 
 ; -----
 ;  signed word multiplication
@@ -405,10 +446,25 @@ _start:
     mov word[wAns16], ax
 
 ;	wans17 = wnum4 / wnum2
+
+    mov ax, word[wNum4]
+    mov dx, 0
+    div word[wNum2]
+    mov word[wAns17], ax
+
 ;	wans18 = dnum2 / wnum3 
+
+    mov eax, dword[dNum2]
+    mov edx, 0
+    div word[dNum3]
+    mov word[wAns18], ax
+
 ;	wrem18 = modulus (dnum2 / wnum3) 
 
-
+    mov eax, dword[dNum2]
+    mov edx, 0
+    div word[wNum3]
+    mov word[wRem18], dx
 
 ; -----
 ;  signed word division
@@ -420,10 +476,23 @@ _start:
     mov word[wAns19], ax
 
 ;	wans20 = wnum4 / wnum2
+
+    mov ax, word[wNum4]
+    cwd
+    idiv word[wNum2]
+    mov word[wAns20], ax
+
 ;	wans21 = dnum2 / wnum3 
+
+    mov eax, dword[dNum2]
+    idiv word[wNum3]
+    mov word[wAns21], ax
+
 ;	wrem21 = modulus (dnum2 / wnum3)
 
-
+    mov eax, dword[dNum2]
+    idiv word[wNum3]
+    mov word[wRem21], dx
 
 ; *****************************************
 ;  DOUBLEWORD Operations
@@ -431,14 +500,31 @@ _start:
 ; -----
 ;  unsigned double word additions
 ;	dans1 = dnum1 + dnum3
+
+    mov esi, dword[dNum1]
+    add esi, dword[dNum3]
+    mov dword[dAns1], esi
+
 ;	dans2 = dnum3 + dnum2
+
+    mov r8d, dword[dNum3]
+    add r8d, dword[dNum2]
+    mov dword[dAns2], r8d
+
 ;	dans3 = dnum4 + dnum1
 
-
+    mov ecx, dword[dNum4]
+    add ecx, dword[dNum1]
+    mov dword[dAns3], ecx
 
 ; -----
 ;  signed double word additions
 ;	dans4 = dnum5 + dnum4 
+
+    mov edx, dword[dNum5]
+    add edx, dword[dNum4]
+    mov dword[dAns4], edx
+
 ;	dans5 = dnum6 + dnum2
 
 
@@ -452,16 +538,30 @@ _start:
     mov dword[dAns6], eax
 
 ;	dans7 = dnum1 - dnum4
+
+    mov r8d, dword[dNum1]
+    sub r8d, dword[dNum4]
+    mov dword[dAns7], r8d
+
 ;	dans8 = dnum4 - dnum3
 
-
+    mov esi, dword[dNum4]
+    sub esi, dword[dNum3]
+    mov dword[dAns8], esi
 
 ; -----
 ;  signed double word subtraction
 ;	dans9 = dnum2 - dnum6 
+
+    mov ecx, dword[dNum2]
+    sub ecx, dword[dNum6]
+    mov dword[dAns9], ecx
+
 ;	dans10 = dnum5 – dnum2 
 
-
+    mov r10d, dword[dNum5]
+    sub r10d, dword[dNum2]
+    mov dword[dAns10], r10d
 
 ; -----
 ;  unsigned double word multiplication
@@ -481,7 +581,10 @@ _start:
 
 ;	qans13 = dnum2 * dnum3
 
-
+    mov eax, dword[dNum2]
+    mul dword[dNum3]
+    mov dword[qAns13], eax
+    mov dword[qAns13+4], edx
 
 ; -----
 ;  signed double word multiplication
@@ -494,7 +597,10 @@ _start:
 
 ;	qans15 = dnum5 * dnum6
 
-
+    mov eax, dword[dNum5]
+    imul dword[dNum6]
+    mov dword[qAns15], eax
+    mov dword[qAns15+4], edx
 
 ; -----
 ;  unsigned double word division
@@ -506,7 +612,16 @@ _start:
     mov dword[dAns16], eax
 
 ;	dans17 = dnum1 / dnum2
+
+    mov eax, dword[dNum1]
+    mov edx, 0
+    div dword[dNum2]
+    mov dword[dAns17], eax
+
 ;	dans18 = qAns13 / dnum1
+
+    
+
 ;	drem18 = modulus (qAns13 / dnum1)
 
 
@@ -552,12 +667,24 @@ _start:
 
 ;	qAns5  = qNum6 + qNum5
 
-
+    mov r8, qword[qNum6]
+    add r8, qword[qNum5]
+    mov qword[qAns5], r8
 
 ; -----
 ;  unsigned quadword subtractions
 ;	qAns6  = qNum1 - qNum3
+
+    mov rsi, qword[qNum1]
+    sub rsi, qword[qNum3]
+    mov qword[qAns6], rsi
+
 ;	qAns7  = qNum2 - qNum4
+
+    mov rcx, qword[qNum2]
+    sub rcx, qword[qNum4]
+    mov qword[qAns7], rcx
+
 ;	qAns8  = qNum4 - qNum3
 
 
@@ -579,9 +706,18 @@ _start:
     mov qword[dqAns11+8], rdx
 
 ;	dqAns12  = qNum2 * qNum3
+
+    mov rax, qword[qNum2]
+    mul qword[qNum3]
+    mov qword[dqAns12], rax
+    mov qword[dqAns12+8], rdx
+
 ;	dqAns13  = qNum3 * qNum1
 
-
+    mov rax, qword[qNum3]
+    mul qword[qNum1]
+    mov qword[dqAns13], rax
+    mov qword[dqAns13+8], rdx
 
 ; -----
 ;  signed quadword multiplication
@@ -593,6 +729,11 @@ _start:
     mov qword[dqAns14+8], rdx
 
 ;	dqAns15  = qNum6 * qNum1
+
+    mov rax, qword[qNum6]
+    imul qword[qNum1]
+    mov qword[dqAns15], rax
+    mov qword[dqAns15+8], rdx
 
 
 
@@ -613,8 +754,18 @@ _start:
     mov qword[qAns17], rax
 
 ;	qAns18 = dqAns13 / qNum2
+
+    mov rax, qword[dqAns13]
+    mov rdx, qword[dqAns13+8]
+    div qword[qNum2]
+    mov qword[qAns18], rax
+
 ;	qRem18 = dqAns13 % qNum2
 
+    mov rax, qword[dqAns13]
+    mov rdx, qword[dqAns13]
+    div qword[qNum2]
+    mov qword[qRem18], rdx
 
 
 ; -----
@@ -627,6 +778,12 @@ _start:
     mov qword[qAns19], rax
 
 ;	qAns20 = qNum3 / qNum6
+
+    mov rax, qword[qNum3]
+    cqo
+    idiv qword[qNum6]
+    mov qword[qAns20], rax
+
 ;	qAns21 = dqAns12 / qNum5
 ;	qRem21 = dqAns12 % qNum5
 
