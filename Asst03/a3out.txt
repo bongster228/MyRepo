@@ -1,0 +1,131 @@
+------------------------------------ 
+display byte calculation variables 
+bNum1: 		0x6009c0:	33
+bNum2: 		0x6009c1:	19
+bNum3: 		0x6009c2:	16
+bNum4: 		0x6009c3:	13
+bNum5: 		0x6009c4:	-46
+bNum6: 		0x6009c5:	-69
+bAns1: 		0x6009c6:	52
+bAns2: 		0x6009c7:	29
+bAns3: 		0x6009c8:	49
+bAns4: 		0x6009c9:	-53
+bAns5: 		0x6009ca:	-115
+bAns6: 		0x6009cb:	17
+bAns7: 		0x6009cc:	-14
+bAns8: 		0x6009cd:	-3
+bAns9: 		0x6009ce:	-82
+bAns10: 	0x6009cf:	-23
+wAns11: 	0x6009d0:	247
+wAns12: 	0x6009d2:	429
+wAns13: 	0x6009d4:	304
+wAns14: 	0x6009d6:	-736
+wAns15: 	0x6009d8:	3174
+bAns16: 	0x6009da:	6
+bAns17: 	0x6009db:	2
+bAns18: 	0x6009dc:	122
+bRem18: 	0x6009dd:	1
+bAns19: 	0x6009de:	-4
+bAns20: 	0x6009df:	1
+bAns21: 	0x6009e0:	70
+bRem21: 	0x6009e1:	4
+
+------------------------------------ 
+display word calculation variables 
+wNum1: 		0x6009e2:	356
+wNum2: 		0x6009e4:	1953
+wNum3: 		0x6009e6:	5817
+wNum4: 		0x6009e8:	2314
+wNum5: 		0x6009ea:	-753
+wNum6: 		0x6009ec:	-276
+wAns1: 		0x6009ee:	2670
+wAns2: 		0x6009f0:	7770
+wAns3: 		0x6009f2:	4267
+wAns4: 		0x6009f4:	-1029
+wAns5: 		0x6009f6:	2038
+wAns6: 		0x6009f8:	3864
+wAns7: 		0x6009fa:	361
+wAns8: 		0x6009fc:	-361
+wAns9: 		0x6009fe:	-2590
+wAns10: 	0x600a00:	-477
+dAns11: 	0x600a02:	11360601
+dAns12: 	0x600a06:	4519242
+dAns13: 	0x600a0a:	2070852
+dAns14: 	0x600a0e:	207828
+dAns15: 	0x600a12:	-1742442
+wAns16: 	0x600a16:	5
+wAns17: 	0x600a18:	1
+wAns18: 	0x600a1a:	1
+wRem18: 	0x600a1c:	3366
+wAns19: 	0x600a1e:	2
+wAns20: 	0x600a20:	1
+wAns21: 	0x600a22:	4072
+wRem21: 	0x600a24:	2827
+
+------------------------------------ 
+display double-word calculation variables 
+dNum1: 		0x600a26:	14365870
+dNum2: 		0x600a2a:	32451
+dNum3: 		0x600a2e:	938671
+dNum4: 		0x600a32:	58473
+dNum5: 		0x600a36:	-7982
+dNum6: 		0x600a3a:	-5358
+dAns1: 		0x600a3e:	15304541
+dAns2: 		0x600a42:	971122
+dAns3: 		0x600a46:	14424343
+dAns4: 		0x600a4a:	50491
+dAns5: 		0x600a4e:	27093
+dAns6: 		0x600a52:	906220
+dAns7: 		0x600a56:	14307397
+dAns8: 		0x600a5a:	-880198
+dAns9: 		0x600a5e:	37809
+dAns10: 	0x600a62:	-40433
+qAns11: 	0x600a66:	54886909383
+qAns12: 	0x600a6e:	13484825558770
+qAns13: 	0x600a76:	30460812621
+qAns14: 	0x600a7e:	-259023882
+qAns15: 	0x600a86:	42767556
+dAns16: 	0x600a8e:	1
+dAns17: 	0x600a92:	442
+dAns18: 	0x600a96:	6735228
+dRem18: 	0x600a9a:	671921
+dAns19: 	0x600a9e:	-6
+dAns20: 	0x600aa2:	1
+dAns21: 	0x600aa6:	-347202581
+dRem21: 	0x600aaa:	-1594359119
+
+------------------------------------ 
+display quadword calculation variables 
+qNum1: 		0x600aae:	204623
+qNum2: 		0x600ab6:	32543819
+qNum3: 		0x600abe:	2415331
+qNum4: 		0x600ac6:	341087
+qNum5: 		0x600ace:	-921028
+qNum6: 		0x600ad6:	-281647
+qAns1: 		0x600ade:	2619954
+qAns2: 		0x600ae6:	32884906
+qAns3: 		0x600aee:	34959150
+qAns4: 		0x600af6:	31622791
+qAns5: 		0x600afe:	-1202675
+qAns6: 		0x600b06:	-2210708
+qAns7: 		0x600b0e:	32202732
+qAns8: 		0x600b16:	-2074244
+qAns9: 		0x600b1e:	33464847
+qAns10: 	0x600b26:	-33464847
+dqAns11: 	0x600b2e:	11100273591253
+dqAns12: 	0x600b3e:	78604094889089
+dqAns13: 	0x600b4e:	494232275213
+dqAns14: 	0x600b5e:	-29973768525932
+dqAns15: 	0x600b6e:	-57631454081
+qAns16: 	0x600b7e:	13
+qAns17: 	0x600b86:	7
+qAns18: 	0x600b8e:	15186
+qRem18: 	0x600b96:	21839879
+qAns19: 	0x600b9e:	3
+qAns20: 	0x600ba6:	-8
+qAns21: 	0x600bae:	-85343871
+qRem21: 	0x600bb6:	69701
+
+------------------------------------ 
+
+ 

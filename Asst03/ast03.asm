@@ -324,8 +324,6 @@ _start:
     idiv byte[bNum1]
     mov byte[bRem21], ah
 
-
-
 ; *****************************************
 ;  WORD Operations
 
@@ -491,9 +489,9 @@ _start:
 ;	wrem21 = modulus (dnum2 / wnum3)
 
     mov eax, dword[dNum2]
-    idiv word[wNum3]
+    div word[wNum3]
     mov word[wRem21], dx
-
+    
 ; *****************************************
 ;  DOUBLEWORD Operations
 
@@ -527,7 +525,9 @@ _start:
 
 ;	dans5 = dnum6 + dnum2
 
-
+    mov edi, dword[dNum6]
+    add edi, dword[dNum2]
+    mov dword[dAns5], edi
 
 ; -----
 ;  unsigned double word subtractions
@@ -620,11 +620,15 @@ _start:
 
 ;	dans18 = qAns13 / dnum1
 
-    
+    mov rax, qword[qAns13]
+    div dword[dNum1]
+    mov dword[dAns18], eax
 
 ;	drem18 = modulus (qAns13 / dnum1)
 
-
+    mov rax, qword[qAns13]
+    div dword[dNum1]
+    mov dword[dRem18], edx
 
 ; -----
 ;  signed double word division
@@ -636,10 +640,23 @@ _start:
     mov dword[dAns19], eax
 
 ;	dans20 = dnum5 / dnum6
+
+    mov eax, dword[dNum5]
+    cdq
+    idiv dword[dNum6]
+    mov dword[dAns20], eax
+
 ;	dans21 = qans12 / dnum2
+
+    mov rax, qword[qAns12]
+    idiv dword[dNum2]
+    mov dword[dAns21], eax
+
 ;	drem21 = modulus (qans12 / dnum2)
 
-
+    mov rax, qword[qAns12]
+    idiv dword[dNum2]
+    mov dword[dRem21], eax
 
 ; *****************************************
 ;  QUADWORD Operations
@@ -653,9 +670,16 @@ _start:
     mov qword[qAns1], rax
 
 ;	qAns2  = qNum2 + qNum4
+
+    mov r8, qword[qNum2]
+    add r8, qword[qNum4]
+    mov qword[qAns2], r8
+
 ;	qAns3  = qNum3 + qNum2
 
-
+    mov rsi, qword[qNum3]
+    add rsi, qword[qNum2]
+    mov qword[qAns3], rsi
 
 ; -----
 ;  signed quadword additions
@@ -687,14 +711,23 @@ _start:
 
 ;	qAns8  = qNum4 - qNum3
 
-
+    mov rdi, qword[qNum4]
+    sub rdi, qword[qNum3]
+    mov qword[qAns8], rdi
 
 ; -----
 ;  signed quadword subtraction
 ;	qAns9  = qNum2 - qNum5
+
+    mov r11, qword[qNum2]
+    sub r11, qword[qNum5]
+    mov qword[qAns9], r11
+
 ;	qAns10 = qNum5 - qNum2
 
-
+    mov rsi, qword[qNum5]
+    sub rsi, qword[qNum2]
+    mov qword[qAns10], rsi
 
 ; -----
 ;  unsigned quadword multiplication
@@ -735,8 +768,6 @@ _start:
     mov qword[dqAns15], rax
     mov qword[dqAns15+8], rdx
 
-
-
 ; -----
 ;  unsigned quadword division
 ;	qAns16 = qNum2 / qNum3
@@ -763,10 +794,9 @@ _start:
 ;	qRem18 = dqAns13 % qNum2
 
     mov rax, qword[dqAns13]
-    mov rdx, qword[dqAns13]
+    mov rdx, qword[dqAns13+8]
     div qword[qNum2]
     mov qword[qRem18], rdx
-
 
 ; -----
 ;  signed quadword division
@@ -785,9 +815,18 @@ _start:
     mov qword[qAns20], rax
 
 ;	qAns21 = dqAns12 / qNum5
+
+    mov rax, qword[dqAns12]
+    mov rdx, qword[dqAns12+8]
+    idiv qword[qNum5]
+    mov qword[qAns21], rax
+
 ;	qRem21 = dqAns12 % qNum5
 
-
+    mov rax, qword[dqAns12]
+    mov rdx, qword[dqAns12+8]
+    idiv qword[qNum5]
+    mov qword[qRem21], rdx
 
 ; *****************************************************************
 ;  Done, terminate program.
