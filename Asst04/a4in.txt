@@ -1,0 +1,49 @@
+b last
+run
+set pagination off
+set logging file a4out.txt
+set logging overwrite
+set logging on
+
+echo len: \t\t
+x/dw &len
+
+echo lstMin: \t\t
+x/dw &lstMin
+
+echo lstMid: \t\t
+x/dw &lstMid
+
+echo lstMax: \t\t
+x/dw &lstMax
+
+echo lstSum: \t\t
+x/dw &lstSum
+
+echo lstAve: \t\t
+x/dw &lstAve
+
+echo ----------------------------- \n
+
+echo posCnt: \t\t
+x/dw &posCnt
+
+echo posSum: \t\t
+x/dw &posSum
+
+echo posAve: \t\t
+x/dw &posAve
+
+echo ----------------------------- \n
+
+echo threeCnt: \t\t
+x/dw &threeCnt
+
+echo threeSum: \t\t
+x/dw &threeSum
+
+echo threeAve: \t\t
+x/dw &threeAve
+
+set logging off
+quit
