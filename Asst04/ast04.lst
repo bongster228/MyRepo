@@ -76,67 +76,183 @@
     76 0000017C 040000B1060000D10B-
     77 0000017C 0000               
     78 00000190 64000000               len dd 100
-    79                                 
-    80 00000194 00000000               lstMin dd 0
-    81 00000198 00000000               lstMid dd 0
-    82 0000019C 00000000               lstMax dd 0
-    83 000001A0 00000000               lstSum dd 0
-    84 000001A4 00000000               lstAve dd 0
-    85                                 
-    86 000001A8 00000000               posCnt dd 0
-    87 000001AC 00000000               posSum dd 0
-    88 000001B0 00000000               posAve dd 0
-    89                                 
-    90 000001B4 00000000               threeCnt dd 0
-    91 000001B8 00000000               threeSum dd 0
-    92 000001BC 00000000               threeAve dd 0
-    93                                 
-    94                                 
-    95                                 [section .text]
-    96                                 [global _start]
-    97                                 _start:
-    98                                 
-    99                                 
-   100 00000000 C70425[00000000]00-    mov dword[lstSum], 0
-   101 00000000 000000             
-   102 0000000B 49C7C0[00000000]       mov r8, lst
-   103 00000012 48C7C100000000         mov rcx, 0
-   104 00000019 8B0C25[00000000]       mov ecx, dword[len]
-   105 00000020 48C7C600000000         mov rsi, 0
+    79 00000194 00000000               cnt dd 0
+    80                                 
+    81 00000198 00000000               lstMin dd 0
+    82 0000019C 00000000               lstMid dd 0
+    83 000001A0 00000000               lstMax dd 0
+    84 000001A4 00000000               lstSum dd 0
+    85 000001A8 00000000               lstAve dd 0
+    86                                 
+    87 000001AC 00000000               posCnt dd 0
+    88 000001B0 00000000               posSum dd 0
+    89 000001B4 00000000               posAve dd 0
+    90                                 
+    91 000001B8 00000000               threeCnt dd 0
+    92 000001BC 00000000               threeSum dd 0
+    93 000001C0 00000000               threeAve dd 0
+    94 000001C4 03000000               three dd 3
+    95                                 
+    96                                 
+    97                                 [section .text]
+    98                                 [global _start]
+    99                                 _start:
+   100                                 
+   101                                 
+   102                                 
+   103                                 
+   104 00000000 49C7C2[00000000]        mov r10, lst
+   105                                 
    106                                 
-   107                                 lp:
-   108 00000027 418B30                 mov esi, dword[r8]
-   109 0000002A 013425[00000000]       add dword[lstSum], esi
+   107                                 
+   108 00000007 48C7C200000000          mov rdx, 0
+   109                                 
    110                                 
-   111 00000031 4983C004               add r8, 4
-   112 00000035 FFC9                   dec ecx
-   113 00000037 83F900                 cmp ecx, 0
-   114 0000003A 75E9                   jne lp
+   111 0000000E C70425[00000000]00-     mov dword[lstSum], 0
+   112 0000000E 000000             
+   113 00000019 48C7C600000000          mov rsi, 0
+   114 00000020 8B3425[00000000]        mov esi, dword[len]
    115                                 
    116                                 
-   117 0000003C 49C7C000000000         mov r8, 0
-   118 00000043 49C7C0[00000000]       mov r8, lst
-   119 0000004A C70425[00000000]00-    mov dword[lstMin], 0
-   120 0000004A 000000             
-   121 00000055 48C7C100000000         mov rcx, 0
-   122 0000005C 8B0C25[00000000]       mov ecx, dword[len]
-   123 00000063 48C7C600000000         mov rsi, 0
-   124 0000006A 418B30                 mov esi, dword[r8]
-   125                                 
-   126 0000006D 4983C004               add r8, 4
+   117                                 sumLoop:
+   118 00000027 418B12                  mov edx, dword[r10]
+   119 0000002A 011425[00000000]        add dword[lstSum], edx
+   120 00000031 4983C204                add r10, 4
+   121 00000035 FFCE                    dec esi
+   122                                 
+   123 00000037 FF0425[00000000]        inc dword[cnt]
+   124                                 
+   125 0000003E 83FE00                  cmp esi, 0
+   126 00000041 75E2                    jne sumLoop
    127                                 
-   128                                 lp2:
-   129 00000071 418B30                 mov esi, dword[r8]
-   130 00000074 393425[00000000]       cmp dword[lstMin], esi
-   131 0000007B 7C05                   jl minDone
-   132 0000007D 893425[00000000]       mov dword[lstMin], esi
-   133                                 minDone:
-   134 00000084 4983C004               add r8, 4
-   135 00000088 FFC9                   dec ecx
-   136 0000008A 83F900                 cmp ecx, 0
-   137 0000008D 75E0                   jne lp2
-   138                                 
-   139                                 last:
-   140 0000008F 48C7C03C000000          mov rax, SYS_exit
-   141 00000096 48C7C700000000          mov rdi, EXIT_SUCCESS
-   142 0000009D 0F05                    syscall
+   128                                 
+   129                                 
+   130                                 
+   131                                 
+   132 00000043 48C7C7[00000000]        mov rdi, lst
+   133                                 
+   134                                 
+   135 0000004A 48C7C600000000          mov rsi, 0
+   136                                 
+   137                                 
+   138 00000051 49C7C000000000          mov r8, 0
+   139 00000058 448B0425[00000000]      mov r8d, dword[len]
+   140                                 
+   141                                 
+   142 00000060 8B37                    mov esi, dword[rdi]
+   143 00000062 893425[00000000]        mov dword[lstMin], esi
+   144                                 
+   145                                 
+   146                                 minLoop:
+   147 00000069 8B37                    mov esi, dword[rdi]
+   148 0000006B 393425[00000000]        cmp dword[lstMin], esi
+   149 00000072 7E05                    jle minDone
+   150 00000074 893425[00000000]        mov dword[lstMin], esi
+   151                                 minDone:
+   152 0000007B 4883C704                add rdi, 4
+   153 0000007F 41FFC8                  dec r8d
+   154 00000082 4183F800                cmp r8d, 0
+   155 00000086 75DF                    jne minLoop
+   156                                 
+   157                                 
+   158                                 
+   159                                 
+   160                                 
+   161 00000088 49C7C0[00000000]        mov r8, lst
+   162                                 
+   163                                 
+   164 0000008F 48C7C700000000          mov rdi, 0
+   165 00000096 8B3C25[00000000]        mov edi, dword[len]
+   166                                 
+   167                                 
+   168                                 
+   169 0000009D 48C7C600000000          mov rsi, 0
+   170 000000A4 418B30                  mov esi, dword[r8]
+   171 000000A7 893425[00000000]        mov dword[lstMax], esi
+   172                                 
+   173                                 
+   174                                 maxLoop:
+   175 000000AE 418B30                  mov esi, dword[r8]
+   176 000000B1 393425[00000000]        cmp dword[lstMax], esi
+   177 000000B8 7D05                    jge maxDone
+   178 000000BA 893425[00000000]        mov dword[lstMax], esi
+   179                                 maxDone:
+   180 000000C1 4983C004                add r8, 4
+   181 000000C5 FFCF                    dec edi
+   182 000000C7 83FF00                  cmp edi, 0
+   183 000000CA 75E0                    jne maxLoop
+   184                                 
+   185                                 
+   186                                 
+   187 000000CC 49C7C1C4000000          mov r9, 196
+   188 000000D3 41B800000000            mov r8d, 0
+   189 000000D9 458B81[00000000]        mov r8d, dword[lst+r9]
+   190 000000E0 44890425[00000000]      mov dword[lstMid], r8d
+   191                                 
+   192                                 
+   193 000000E8 8B3C25[00000000]        mov edi, dword[len]
+   194 000000EF 8B0425[00000000]        mov eax, dword[lstSum]
+   195 000000F6 99                      cdq
+   196 000000F7 F7FF                    idiv edi
+   197 000000F9 890425[00000000]        mov dword[lstAve], eax
+   198                                 
+   199                                 
+   200                                 
+   201                                 
+   202 00000100 49C7C0[00000000]        mov r8, lst
+   203 00000107 48C7C600000000          mov rsi, 0
+   204 0000010E 48C7C100000000          mov rcx, 0
+   205 00000115 8B0C25[00000000]        mov ecx, dword[len]
+   206                                 
+   207                                 posSumLp:
+   208 0000011C 418B30                  mov esi, dword[r8]
+   209 0000011F 83FE00                  cmp esi, 0
+   210 00000122 7C0C                    jl notPositive
+   211 00000124 013425[00000000]        add dword[posSum], esi
+   212 0000012B FF0425[00000000]        inc dword[posCnt]
+   213                                 notPositive:
+   214 00000132 4983C004                add r8, 4
+   215 00000136 FFC9                    dec ecx
+   216 00000138 83F900                  cmp ecx, 0
+   217 0000013B 75DD                    jne posSumLp
+   218                                 
+   219                                 
+   220                                 
+   221 0000013D 8B0425[00000000]        mov eax, dword[posSum]
+   222 00000144 99                      cdq
+   223 00000145 F73C25[00000000]        idiv dword[posCnt]
+   224 0000014C 890425[00000000]        mov dword[posAve], eax
+   225                                 
+   226                                 
+   227                                 
+   228 00000153 49C7C0[00000000]        mov r8, lst
+   229 0000015A 48C7C600000000          mov rsi, 0
+   230 00000161 48C7C000000000          mov rax, 0
+   231 00000168 48C7C700000000          mov rdi, 0
+   232 0000016F 8B3C25[00000000]        mov edi, dword[len]
+   233                                 
+   234                                 threeLp:
+   235 00000176 418B30                  mov esi, dword[r8]
+   236 00000179 89F0                    mov eax, esi
+   237 0000017B 99                      cdq
+   238 0000017C F73C25[00000000]        idiv dword[three]
+   239 00000183 83FA00                  cmp edx, 0
+   240 00000186 750C                    jne notThree
+   241 00000188 013425[00000000]        add dword[threeSum], esi
+   242 0000018F FF0425[00000000]        inc dword[threeCnt]
+   243                                 notThree:
+   244 00000196 4983C004                add r8, 4
+   245 0000019A FFCF                    dec edi
+   246 0000019C 83FF00                  cmp edi, 0
+   247 0000019F 75D3                    jne threeLp
+   248                                 
+   249                                 
+   250 000001A1 8B0425[00000000]        mov eax, dword[threeSum]
+   251 000001A8 99                      cdq
+   252 000001A9 F73C25[00000000]        idiv dword[threeCnt]
+   253 000001B0 890425[00000000]        mov dword[threeAve], eax
+   254                                 
+   255                                 last:
+   256 000001B7 48C7C03C000000          mov rax, SYS_exit
+   257 000001BE 48C7C700000000          mov rdi, EXIT_SUCCESS
+   258 000001C5 0F05                    syscall

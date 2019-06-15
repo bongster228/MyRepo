@@ -49,49 +49,163 @@ posAve		dd	0
 threeCnt	dd	0
 threeSum	dd	0
 threeAve	dd	0
+three		dd	3
 
 
 section .text
 global _start
 _start:
 
-; Find the total Sum
-mov dword[lstSum], 0 ; Initialize the variable used to store the sum
-mov r8, lst ; Has the starting point of the array
-mov rcx, 0
-mov ecx, dword[len] ; Store the length of the array
-mov rsi, 0 ; Used to store value that will be added to the total sum
+; Find the total sum
 
-lp:
-mov esi, dword[r8] ; Store the current value from the array
-add dword[lstSum], esi ; Add the current value to the total sum
+; Store the address of the array
+	mov r10, lst
 
-add r8, 4 ; Move the index by 4 bytes(double word)
-dec ecx ; Decrement the count
-cmp ecx, 0 ; Compare value at ecx with zero
-jne lp ; If the value at ecx is not zero, jump to lp
+; Set up register to be used to hold values
+; from the array
+	mov rdx, 0
 
-; Find the min value
-mov r8, 0
-mov r8, lst ; Used as index to iterate throug the array
-mov dword[lstMin], 0
-mov rcx, 0
-mov ecx, dword[len] ; Used to decrement down for the iteration
-mov rsi, 0 ; Used to temporarily store the values from the array
-mov esi, dword[r8] ; Put the first value in the array into the esi register
+; Set up counter and initialize totalSum variable
+	mov dword[lstSum], 0
+	mov rsi, 0
+	mov esi, dword[len]
 
-add r8, 4 ; Add 4 bytes to move the index
+; Use loop to sum up elements
+sumLoop:
+	mov edx, dword[r10]
+	add dword[lstSum], edx
+	add r10, 4
+	dec esi
+	
+	cmp esi, 0
+	jne sumLoop
 
-lp2:
-mov esi, dword[r8] ; Put the value inside esi register
-cmp dword[lstMin], esi
-jl minDone
-mov dword[lstMin], esi
+
+; Find min value
+
+; Store the address of the lst array
+	mov rdi, lst
+
+; Store current element
+	mov rsi, 0
+
+; Store the counter
+	mov r8, 0
+	mov r8d, dword[len]
+
+; Put the first element in the min variable
+	mov esi, dword[rdi]
+	mov dword[lstMin], esi
+
+; Use loop to find the min element
+minLoop:
+	mov esi, dword[rdi]
+	cmp dword[lstMin], esi
+	jle minDone
+	mov dword[lstMin], esi
 minDone:
-add r8, 4
-dec ecx
-cmp ecx, 0
-jne lp2
+	add rdi, 4
+	dec r8d
+	cmp r8d, 0
+	jne minLoop
+
+
+; Find the max value
+
+; Store the base address of the array
+	mov r8, lst
+
+; Store the size of the array
+	mov rdi, 0
+	mov edi, dword[len]
+
+; Register to store the current value from the array
+; Store the first element in the array in the lstMax variable
+	mov rsi, 0
+	mov esi, dword[r8]
+	mov dword[lstMax], esi
+
+; Loop through the array to find the max value
+maxLoop:
+	mov esi, dword[r8]
+	cmp dword[lstMax], esi
+	jge maxDone
+	mov dword[lstMax], esi
+maxDone:
+	add r8, 4
+	dec edi
+	cmp edi, 0
+	jne maxLoop
+
+; Find the mid value(unsorted)
+
+	mov r9, 4
+	mov r8d, 0
+	mov r8d, dword[lst+r9 * 49]
+	mov dword[lstMid], r8d
+	
+; Find the average
+	mov edi, dword[len]
+	mov eax, dword[lstSum]
+	cdq
+	idiv edi
+	mov dword[lstAve], eax
+
+; Find the sum, count, and avg of positive elements
+	
+; Find the positive sum and count
+	mov r8, lst ; Store the address of the array
+	mov rsi, 0 ; Used to store current element
+	mov rcx, 0
+	mov ecx, dword[len] ; Store the length of the array
+
+posSumLp:
+	mov esi, dword[r8]
+	cmp esi, 0
+	jl notPositive
+	add dword[posSum], esi
+	inc dword[posCnt]
+notPositive:
+	add r8, 4
+	dec ecx
+	cmp ecx, 0
+	jne posSumLp
+
+; Calculate positive avg
+
+	mov eax, dword[posSum]
+	cdq
+	idiv dword[posCnt]
+	mov dword[posAve], eax
+
+; Calculate threeCnt, sum, and avg
+
+	mov r8, lst
+	mov rsi, 0
+	mov rax, 0
+	mov rdi, 0
+	mov edi, dword[len]
+
+threeLp:
+	mov esi, dword[r8]
+	mov eax, esi
+	cdq
+	idiv dword[three]
+	cmp edx, 0
+	jne notThree
+	add dword[threeSum], esi
+	inc dword[threeCnt]
+notThree:
+	add r8, 4
+	dec edi
+	cmp edi, 0
+	jne threeLp
+
+; Calculate threeAve
+	mov eax, dword[threeSum]
+	cdq
+	idiv dword[threeCnt]
+	mov dword[threeAve], eax
 
 last:
     mov rax, SYS_exit
