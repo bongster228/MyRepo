@@ -1,3 +1,7 @@
+; Bong Lee
+; CS218 1001
+; Ast04
+
 section	.data
 
 ; -----
@@ -139,10 +143,20 @@ maxDone:
 
 ; Find the mid value(unsorted)
 
-	mov r9, 4
-	mov r8d, 0
-	mov r8d, dword[lst+r9 * 49]
-	mov dword[lstMid], r8d
+	mov r8, 196
+	mov r9, 200
+	mov r10, 0
+	mov r10d, dword[lst+r8]
+	add dword[lstMid], r10d
+	mov r10d, dword[lst+r9]
+	add dword[lstMid], r10d
+	
+	mov rax, 0
+	mov r10d, 2
+	mov eax, dword[lstMid]
+	cdq
+	idiv r10d
+	mov dword[lstMid], eax
 	
 ; Find the average
 	mov edi, dword[len]
