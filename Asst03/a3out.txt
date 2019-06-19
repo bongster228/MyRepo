@@ -1,3 +1,7 @@
+Bong Lee
+CS 218 1001
+Ast03
+
 ------------------------------------ 
 display byte calculation variables 
 bNum1: 		0x6009c0:	33
