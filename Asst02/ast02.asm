@@ -52,6 +52,9 @@ myClass		db	"CS 218", NULL
 edName		db	"Ed Jorgensen", NULL
 myName		db	"Bong Lee", NULL
 
+numbers     dq  121,122,123,124,125
+len         dq  5
+
 
 ; *****************************************************************
 
@@ -107,6 +110,28 @@ _start:
     mov eax, dword[dVar1]
     sub eax, dword[dVar2]
     mov dword[dAns2], eax
+
+
+; Push and Pop
+
+    mov rcx, qword[len]
+    mov rbx, numbers
+    mov r8, 0
+
+    pushLoop:
+    push qword[rbx+r8*8]
+    inc r8
+    loop pushLoop
+
+    mov rcx, qword[len]
+    mov r8, 0
+    mov r9, 0
+
+    popLoop:
+    pop r9
+    mov qword[rbx+r8*8], r9
+    inc r8
+    loop popLoop
 
 
 ; *****************************************************************

@@ -1,0 +1,49 @@
+b last
+run
+set pagination off
+set logging file a5out.txt
+set logging overwrite
+set logging on
+
+echo cubeArea: \n
+x/100uh &cubeAreas
+
+echo \n
+
+echo areaSum: \t
+x/uw &caSum
+
+echo minArea: \t
+x/uh &caMin
+
+echo \n
+
+echo maxArea: \t
+x/uh &caMax 
+
+echo \n
+
+echo midArea: \t
+x/uh &caMid
+
+echo \n\n\n
+
+echo cubeVolumes:
+x/100uw &cubeVolumes
+
+echo \n
+
+echo volumeSum: \t
+x/ud &cvSum
+
+echo \n
+
+echo minVolume: \t
+x/ud &cvMin
+
+echo \n
+echo maxVolume: \t
+x/ud &cvMax
+
+set logging off
+quit

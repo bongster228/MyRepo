@@ -143,20 +143,30 @@ maxDone:
 
 ; Find the mid value(unsorted)
 
-	mov r8, 196
-	mov r9, 200
+	mov rcx, 0
+	mov ecx, dword[len]
+
+	mov r8, 0
+	mov r8d, 2
+	mov r9, 0
 	mov r10, 0
-	mov r10d, dword[lst+r8]
-	add dword[lstMid], r10d
-	mov r10d, dword[lst+r9]
-	add dword[lstMid], r10d
-	
-	mov rax, 0
-	mov r10d, 2
-	mov eax, dword[lstMid]
-	cdq
-	idiv r10d
+
+; Find the middle index
+	mov eax, dword[len]
+	mov edx, 0
+	div r8d
+	;Store the middle index
+	mov r10d, eax
+
+; Find the average of the upper and lower middle index
+; to get the middle value
+	mov r9d, dword[lst+r10d*4] 
+	dec r10d
+	add r9d, dword[lst+r10d*4]
+	mov eax, r9d
+	div r8d
 	mov dword[lstMid], eax
+
 	
 ; Find the average
 	mov edi, dword[len]

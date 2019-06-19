@@ -1,14 +1,14 @@
-len: 		0x600438:	100
-lstMin: 		0x60043c:	-3622
-lstMid: 		0x600440:	2449
-lstMax: 		0x600444:	7321
-lstSum: 		0x600448:	96747
-lstAve: 		0x60044c:	967
+len: 		0x600444:	100
+lstMin: 		0x600448:	-3622
+lstMid: 		0x60044c:	2449
+lstMax: 		0x600450:	7321
+lstSum: 		0x600454:	96747
+lstAve: 		0x600458:	967
 ----------------------------- 
-posCnt: 		0x600450:	75
-posSum: 		0x600454:	140340
-posAve: 		0x600458:	1871
+posCnt: 		0x60045c:	75
+posSum: 		0x600460:	140340
+posAve: 		0x600464:	1871
 ----------------------------- 
-threeCnt: 		0x60045c:	31
-threeSum: 		0x600460:	33993
-threeAve: 		0x600464:	1096
+threeCnt: 		0x600468:	31
+threeSum: 		0x60046c:	33993
+threeAve: 		0x600470:	1096
