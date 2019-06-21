@@ -1,9 +1,96 @@
-;  Must include:
-;	Bong Lee
-;	assignment 01
-;	section 1001
+;	Macro Test File
 
-;   No name, asst, section -> no points!
+%macro tstStats 7
+
+	push rax
+	push rbx
+	push rcx
+	push rdx
+	push rsi
+
+
+	pop rsi
+	pop rdx
+	pop rcx
+	pop rbx
+	pop rax
+
+%endmacro
+
+%macro tstStats 8
+
+	push rax
+	push rbx
+	push rcx
+	push rdx
+	push rsi
+	push rdi
+
+	mov rsi, %1
+	mov rdi, %2
+	mov ecx, %3
+
+	%%sqLoop:
+	mov ax, word[rdi]
+	mul ax
+	mov word[sqVal], ax
+	mov word[sqVal+2], dx
+	mov ebx, dword[sqVal]
+	mov dword[rsi], ebx
+	add rdi, 2
+	add rsi ,4
+	loop %%sqLoop
+
+	;Min and max
+	mov eax, dword[%1]
+	mov dword[%4], eax
+	mov ecx, %3
+	mov eax, dword[%1+ecx*4-4]
+	mov dword[%6], eax
+
+	;Find med
+	mov eax, %3
+	mov ebx, 2
+	mov edx, 0
+	div ebx
+	cmp edx, 0
+	je %%isEven
+	mov ebx, dword[%1+eax*4]
+	mov dword[%5], ebx
+
+	%%isEven:
+	mov ebx, eax
+	mov eax, dword[%1+ebx*4]
+	dec ebx
+	add eax, dword[%1+ebx*4]
+	mov ebx, 2
+	mov edx, 0
+	div ebx
+	mov dword[%5], eax
+
+	mov rsi, %1
+	mov ecx, %3
+	mov rax, 0
+	%%sumLp:
+	add eax, dword[rsi]
+	add rsi, 4
+	loop %%sumLp
+	mov dword[%7], eax
+	mov ecx, %3
+	mov edx, 0
+	div ecx
+	mov dword[%8], eax
+
+	pop rdi
+	pop rsi
+	pop rdx
+	pop rcx
+	pop rbx
+	pop rax
+
+%endmacro
+
+
 
 ; *****************************************************************
 ;  Data Declarations
@@ -23,51 +110,33 @@ SYS_exit	equ	60			; call code for terminate
 ; -----
 ;  Byte (8-bit) variable declarations
 
-	num1	db	17
-	num2	db	9
 
-	res1	db	0
-	res2	db	0
-	res3	dw	0
-	res4	db	0
-	rem4	db	0
+	;	tstMacro Macro variables
 
-; -----
-;  Word (16-bit) variable declarations
+	n1	dd	0
+	n2w	dw	0
+	n3	dd	0
 
-	num3	dw	5003
-	num4	dw	7
+	res1	dd	0
+	res2	dd	0
+	res3	dd	0
+	rem3	dd	0
 
-	res5	dw	0
-	res6	dw	0
-	res7	dd	0
-	res8	dw	0
-	rem8	dw	0
+	;	tstStats Macro variables
 
-; -----
-;  Double-word (32-bit) variable declarations
+	wLst	dw	1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+	len		dd	10
+	min		dd 	0
+	med		dd 	0
+	max		dd	0
+	sum		dd 	0
+	ave		dd 	0
 
-	num5	dd	100007
-	num6	dd	1501
+	sqVal	dd	0
 
-	res9	dd	0
-	res10	dd	0
-	res11	dq	0
-	res12	dd	0
-	rem12	dd	0
+section .bss
 
-; -----
-;  Quadword (64-bit) variable declarations
-
-	num7	dq	12342314
-	num8	dq	14541
-
-	res13	dq	0
-	res14	dq	0
-	res15	ddq	0
-	res16	dq	0
-	rem16	dq	0
-
+	dLst	resd	10
 
 ; *****************************************************************
 ;  Code Section
@@ -79,108 +148,10 @@ _start:
 ; ----------
 ;  Byte variables examples (signed data)
 
-;  res1 = num1 + num2
-	mov	al, byte [num1]
-	add	al, byte [num2]
-	mov	byte [res1], al
+;tstMacro dword[n1], dword[n2w], dword[n3], res1, res2, res3, rem3
+	
 
-;  res2 = num1 - num2
-	mov	al, byte [num1]
-	sub	al, byte [num2]
-	mov	byte [res2], al
-
-;  res3 = num1 * num2
-	mov	al, byte [num1]
-	imul	byte [num2]
-	mov	word [res3], ax
-
-;  res4 = num1 / num2
-;  rem4 = modulus(num1/num2)
-	mov	al, byte [num1]
-	cbw
-	idiv	byte [num2]
-	mov	byte [res4], al
-	mov	byte [rem4], ah
-
-; ----------
-;  Word variables examples (signed data)
-
-;  res5 = num3 + num4
-	mov	ax, word [num3]
-	add	ax, word [num4]
-	mov	word [res5], ax
-
-;  res6 = num3 - num4
-	mov	ax, word [num3]
-	sub	ax, word [num4]
-	mov	word [res6], ax
-
-;  res7 = num3 * num4
-	mov	ax, word [num3]
-	imul	word [num4]
-	mov	dword [res7], eax
-
-;  res8 = num3 / num4
-;  rem8 = modulus(num3/num4)
-	mov	ax, word [num3]
-	cwd
-	idiv	word [num4]
-	mov	word [res8], ax
-	mov	word [rem8], dx
-
-; ----------
-;  Double-word variables examples (signed data)
-
-;  res9 = num5 + num6
-	mov	eax, dword [num5]
-	add	eax, dword [num6]
-	mov	dword [res9], eax
-
-;  res10 = num5 - num6
-	mov	eax, dword [num5]
-	sub	eax, dword [num6]
-	mov	dword [res10], eax
-
-;  res11 = num5 * num6
-	mov	eax, dword [num5]
-	imul	dword [num6]
-	mov	dword [res11], eax
-	mov	dword [res11+4], edx
-
-;  res12 = num5 / num6
-;  rem12 = modulus(num5/num6)
-	mov	eax, dword [num5]
-	cdq
-	idiv	dword [num6]
-	mov	dword [res12], eax
-	mov	dword [rem12], edx
-
-; ----------
-;  Quadword variables examples (signed data)
-
-;  res13 = num7 + num8
-	mov	rax, qword [num7]
-	add	rax, qword [num8]
-	mov	qword [res13], rax
-
-;  res14 = num7 - num8
-	mov	rax, qword [num7]
-	sub	rax, qword [num8]
-	mov	qword [res14], rax
-
-;  res15 = num7 * num8
-	mov	rax, qword [num7]
-	imul	qword [num8]
-	mov	qword [res15], rax
-	mov	qword [res15+8], rdx
-
-;  res16 = num7 / num8
-;  rem16 = modulus(num7/num8)
-	mov	rax, qword [num7]
-	cqo
-	idiv	qword [num8]
-	mov	[res16], rax
-	mov	[rem16], rdx
+tstStats dLst, wLst, dword[len], min, med, max, sum, ave
 
 ; *****************************************************************
 ;  Done, terminate program.
