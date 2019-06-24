@@ -2,7 +2,10 @@
 ;  Functions Template.
 
 ; --------------------------------------------------------------------
-;  Write assembly language procedures/functions.
+;  Write assembly language functions.
+
+;  * Value returning function, readOctalNum(), to read an octal/ASCII
+;    number from input, convert to integer, and return.
 
 ;  * Void function, bubbleSort(), sorts the numbers into descending
 ;    order (large to small).  Uses the bubble sort algorithm from
@@ -24,19 +27,21 @@
 ;  * Integer function, eStatistic(), to compute the m-statistic for
 ;    a list of numbers.
 
-;  Note, all data is signed!
+;  Note, all data is unsigned!
 
 ; ********************************************************************************
+
 
 section	.data
 
 ; -----
-;  Define standard constants.
+;  Define standard constants
 
 TRUE		equ	1
 FALSE		equ	0
 
 EXIT_SUCCESS	equ	0			; Successful operation
+EXIT_NOSUCCESS	equ	1
 
 STDIN		equ	0			; standard input
 STDOUT		equ	1			; standard output
@@ -55,28 +60,160 @@ LF		equ	10
 NULL		equ	0
 ESC		equ	27
 
-; -----
-;  Variables for bubbleSort() void function (if any)
+BUFFSIZE	equ	50
+MINNUMBER	equ	1
+MAXNUMBER	equ	1000
 
-; -----
-;  Variables for cubeAreas() void function (if any)
-
-
-; -----
-;  Variables for cubeStats() void function (if any)
-
-
-; -----
-;  Variables for integer iMedian() function (if any)
+OUTOFRANGEMIN	equ	2
+OUTOFRANGEMAX	equ	3
+INPUTOVERFLOW	equ	4
+ENDOFINPUT	equ	5
 
 
 ; -----
-;  Variables for integer eStatistic() function (if any)
+;  NO STATIC LOCAL VARIABLES
+;  LOCALS MUST BE DEFINED ON THE STACK!!
 
 
 ; **************************************************************************
 
+
 section	.text
+
+; -----------------------------------------------------------------------
+;  Read an octal/ASCII number from the user
+
+;  Return codes:
+;	EXIT_SUCCESS		Successful conversion
+;	EXIT_NOSUCCESS		Invalid input entered
+;	OUTOFRANGEMIN		Input below minimum value
+;	OUTOFRANGEMAX		Input above maximum value
+;	INMPUTOPVERFLOW		User entered char count exceeds maximum len
+;	ENDOFINPUT		End of the input
+
+; -----
+;  Call:
+;	status = readOctalNum(&numberRead);
+
+;  Arguments Passed:
+;	1) numberRead, addr - rdi
+
+;  Returns:
+;	number read (via reference)
+;	status code (as above)
+
+
+
+global readOctalNum
+readOctalNum:
+
+	push rbp
+	mov rbp, rsp
+	sub rsp, 55		;	Allocate local stack memory
+	push rbx
+	push rcx
+	push r12
+	push r13
+	push r14
+
+
+	mov rbx, rdi			;	save the argument
+	lea r12, byte[rbp-50]	;	char array
+	mov r13, 0				;	count
+	mov dword[rbp-55], 0	;	running sum variable
+	mov byte[rbp-51], 0
+
+readLp:
+	mov rax, SYS_read
+	mov rdi, STDIN
+	lea rsi, byte[rbp-51]
+	mov rdx, 1
+	syscall
+
+	mov al, byte[rbp-51]	;	get the input
+	cmp al, LF				;	check for linefeed
+	je	inputDone
+
+	inc r13					;	inc counter
+	cmp r13, BUFFSIZE		;	check for buffer overflow
+	jge	overflow
+
+	mov byte[r12], al
+	inc r12					;	move index of lineArray
+
+	jmp readLp
+
+inputDone:	
+
+	cmp r13, 0
+	je	endInput
+
+	mov byte[r12], NULL		;	terminate the string
+
+	lea r12, byte[rbp-50]	;	Address of the string
+	mov dword[rbp-55], 0	;	initialize running sum
+
+;-----
+	;	Convert to int
+	mov rcx, 0
+	mov rax, 0
+	mov r14, 8
+	mov cl, byte[r12]
+
+convert:
+	cmp cl, NULL
+	je convertDone
+
+	sub cl, "0"
+
+	;	Mult by 8 and add to running sum
+	mov eax, dword[rbp-55]
+	mul r14d
+	add eax, ecx
+	mov dword[rbp-55], eax
+
+	inc r12
+	mov cl, byte[r12]
+	jmp convert
+
+convertDone:
+	mov r14d, dword[rbp-55]
+	mov qword[rbx], r14
+
+	mov rax, EXIT_SUCCESS
+
+	pop r14
+	pop r13
+	pop r12
+	pop rcx
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+endInput:
+
+	mov rax, ENDOFINPUT
+
+	pop r14
+	pop r13
+	pop r12
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+overflow:
+	mov rax, INPUTOVERFLOW
+
+	pop r14
+	pop r13
+	pop r12
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
 
 ; **************************************************************************
 ;  Function to calculate cube areas
@@ -93,6 +230,8 @@ section	.text
 
 ;  Returns:
 ;	cAreas[] via reference
+
+
 
 global cubeAreas
 cubeAreas:
@@ -127,9 +266,12 @@ cubeAreaLp:
 	pop rbp
 	ret
 
+
+
+
 ; **************************************************************************
 ;  Function to implement bubble sort to sort an integer array.
-;	Note, sorts in desending order
+;	Note, sorts in ascending order
 
 ; -----
 ;  HLL Call:
@@ -141,6 +283,8 @@ cubeAreaLp:
 
 ;  Returns:
 ;	sorted list (list passed by reference)
+
+
 
 global	bubbleSort
 bubbleSort:
@@ -155,7 +299,11 @@ bubbleSort:
 	dec esi		; i = len - 1
 outerForLp:
 	;	swapped = false
-	mov byte[rbp-1], FALSE
+
+	
+	mov byte[rbp-1], FALSE 	;	Change to local stack variable
+
+
 	;	for (j = 0 to i)
 	mov ebx, 0
 inForLp:
@@ -167,14 +315,24 @@ inForLp:
 
 	mov dword[rdi+rbx*4], r9d
 	mov dword[rdi+rbx*4+4], r8d
+	
+
+
+	;	Change to local stack variable
 	mov byte[rbp-1], TRUE
+
+
 
 ifDone:
 	inc ebx			; j++
 	cmp ebx, esi
 	jne inForLp
 
+
+	;	Change to local stack variable
 	cmp byte[rbp-1], FALSE
+
+
 	je sortDone
 
 	;	--i
@@ -188,10 +346,12 @@ sortDone:
 	pop r9
 	pop r8
 	pop rbx
-	mov rsp, rbp
+    mov rsp, rbp
 	pop rbp
 
 	ret
+
+
 
 ; **************************************************************************
 ;  Function to find some statistical information of an integer array:
@@ -215,6 +375,8 @@ sortDone:
 ;  Returns:
 ;	minimum, maximum, sum, average, amd
 ;	three sum via pass-by-reference
+
+
 
 global cubeStats
 cubeStats:
@@ -279,6 +441,8 @@ notThree:
 
 	ret
 
+
+
 ; **************************************************************************
 ;  Function to calculate the integer median of an integer array.
 ;	Note, for an odd number of items, the median value is defined as
@@ -295,6 +459,8 @@ notThree:
 
 ;  Returns:
 ;	integer median - value (in eax)
+
+
 
 global iMedian
 iMedian:
@@ -327,23 +493,28 @@ isEven:
 	pop rbp
 	ret
 
+
+
 ; **************************************************************************
 ;  Function to calculate the integer e-statictic of an integer array.
 ;	Formula for eStat is:
 ;		eStat = sum [ (list[i] - median)^2 ]
 ;	Must use iMedian() function to find median.
+
 ;  Note, due to the data sizes, the summation must be performed as a quad-word.
 
 ; -----
 ;  HLL Call:
 ;	var = eStatistic(list, len);
 
-;  Arguments Passed:a
+;  Arguments Passed:
 ;	1) list, addr
 ;	2) length, value
 
 ;  Returns:
 ;	eStat - value (in rax)
+
+
 
 global eStatistic
 eStatistic:
@@ -371,17 +542,49 @@ eStatsSumLp:
 
 	imul eax		;	(sum)^2
 
+
+
+	; Chnage to local stack variable
 	mov dword[rbp-8], eax
 	mov dword[rbp-4], edx
 
 	mov rax, qword[rbp-8]
 
 
+
 	pop r12
-	mov rsp, rbp
+    mov rsp, rbp
 	pop rbp
 
 	ret
 
+
+
 ; ***************************************************************************
 
+global printString
+printString:
+	push rbx
+
+	mov rbx, rdi
+	mov rdx, 0
+strCountLoop:
+	cmp byte[rbx], NULL
+	je	strCountDone
+	inc rdx
+	inc rbx
+	jmp strCountLoop
+strCountDone:
+
+	cmp rdx, 0
+	je	prtDone
+
+	mov rax, SYS_write
+	mov rsi, rdi
+	mov rdi, STDOUT
+	syscall
+
+prtDone:
+
+	pop rbx
+	ret

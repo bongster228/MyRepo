@@ -51,6 +51,8 @@
 	inc rcx
 	mov sil, byte[rcx]
 	mov r9, 0		; Store running sum
+	
+	mov r10, 8
 
 	%%macroCutLp:
 	cmp sil, 0
@@ -61,11 +63,10 @@
 
 	mov rax, 0
 	mov eax, r9d
-	mov r10d, 8
 	mul r10d
-
 	add eax, esi
 	mov r9d, eax
+
 
 	inc rcx
 	mov sil, byte[rcx]
@@ -271,7 +272,7 @@ SYS_creat	equ	85			; system call code for file open/create
 SYS_time	equ	201			; system call code for get time
 
 LF		equ	10
-NULL		equ	0
+NULL	equ	0
 ESC		equ	27
 
 ; -----

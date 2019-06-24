@@ -1,0 +1,45 @@
+--------------------------------------------------
+CS 218 - Assignment #9
+
+Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Error, invalid number. Please re-enter.
+Enter Value (octal): Error, invalid number. Please re-enter.
+Enter Value (octal): Enter Value (octal): Error, invalid number. Please re-enter.
+Enter Value (octal): Enter Value (octal): Error, number above maximum value. Please re-enter.
+Enter Value (octal): Error, number above maximum value. Please re-enter.
+Enter Value (octal): Error, invalid number. Please re-enter.
+Enter Value (octal): Error, invalid number. Please re-enter.
+Enter Value (octal): Enter Value (octal): Enter Value (octal): Error, invalid number. Please re-enter.
+Enter Value (octal): Enter Value (octal): Enter Value (octal): Error, invalid number. Please re-enter.
+Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Error, invalid number. Please re-enter.
+Enter Value (octal): Error, number above maximum value. Please re-enter.
+Enter Value (octal): Error, number above maximum value. Please re-enter.
+Enter Value (octal): Enter Value (octal): Enter Value (octal): Error, number above maximum value. Please re-enter.
+Enter Value (octal): Error, number above maximum value. Please re-enter.
+Enter Value (octal): Error, invalid number. Please re-enter.
+Enter Value (octal): Error, number above maximum value. Please re-enter.
+Enter Value (octal): Error, number above maximum value. Please re-enter.
+Enter Value (octal): --------------------------------------------------
+
+Program Results
+
+Sorted Cube Areas List: 
+   864    1014    3750    4056    4056  
+  6534   10086   10584   10584   10584  
+ 11094   12150   12150   25350   26136  
+ 28566   39366   41334   43350   47526  
+ 47526   47526   47526   51894   57624  
+ 57624   57624   61206   61206   66150  
+ 66150   66150   67416   71286   71286  
+ 71286   76614  114264  114264  126150  
+146016  161376  163350  171366  171366  
+264600  477144  504600  756150  799350  
+
+  Count       =            50
+  Minimum     =           864
+  Maximum     =        799350
+  Median      =         57624
+  Sum         =       5365224
+  Average     =        107304
+  Three Sum   =       5365224
+  e-statistic =  1561719605184
+
