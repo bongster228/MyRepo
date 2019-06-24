@@ -164,6 +164,12 @@ convert:
 	cmp cl, NULL
 	je convertDone
 
+	;	Check the validity of the character
+	cmp cl, 0x30
+	jb	invalidInput
+	cmp cl, 0x37
+	ja	invalidInput
+
 	sub cl, "0"
 
 	;	Mult by 8 and add to running sum
@@ -177,6 +183,9 @@ convert:
 	jmp convert
 
 convertDone:
+
+	;	Check for range 1 ~ 
+
 	mov r14d, dword[rbp-55]
 	mov qword[rbx], r14
 
@@ -194,6 +203,18 @@ convertDone:
 endInput:
 
 	mov rax, ENDOFINPUT
+
+	pop r14
+	pop r13
+	pop r12
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+invalidInput:
+
+	mov rax, EXIT_NOSUCCESS
 
 	pop r14
 	pop r13
@@ -310,7 +331,7 @@ inForLp:
 	mov r8d, dword[rdi+rbx*4]		;	lst[j]
 	mov r9d, dword[rdi+rbx*4+4]	;	lst[j+1]
 	cmp r8d, r9d
-	jge ifDone				;	if	lst[j] >= lst[j+1] then jump
+	jle ifDone				;	if	lst[j] >= lst[j+1] then jump
 
 	mov dword[rdi+rbx*4], r9d
 	mov dword[rdi+rbx*4+4], r8d
@@ -479,6 +500,7 @@ iMedian:
 	je isEven
 
 	mov eax, dword[rdi+rcx*4]
+	jmp medDone
 
 isEven:
 
@@ -488,6 +510,8 @@ isEven:
 	mov ecx, 2
 	cdq
 	idiv ecx
+
+medDone:
 
 	pop rbp
 	ret
@@ -521,69 +545,40 @@ eStatistic:
 	push rbp
 	mov rbp, rsp
 	sub rsp, 8
-	push r12
+	push r11
 	
+	mov rax, 0
 	call iMedian	;	returns the median into eax
 	
 	mov rcx, rax	;	store median in rcx
-	mov rax, 0		;	running sum
-	mov r12, 0		;	list value
+	mov r11, 0		;	running sum
 
 eStatsSumLp:
-	mov r12d, dword[rdi]
-	sub r12d, ecx
-	add eax, r12d
+	mov eax, dword[rdi]
+	sub eax, ecx
+
+	imul eax		; (area - med)^2
+
+	;	Combine the result
+	mov dword[rbp-8], eax
+	mov dword[rbp-4], edx
+
+	;	Add to running sum
+	add r11, qword[rbp-8]
 
 	add rdi, 4
 	dec esi
 	cmp esi, 0
 	jne eStatsSumLp
 
-	imul eax		;	(sum)^2
+	mov rax, r11
 
 
-
-	; Chnage to local stack variable
-	mov dword[rbp-8], eax
-	mov dword[rbp-4], edx
-
-	mov rax, qword[rbp-8]
-
-
-
-	pop r12
+	pop r11
 	mov rsp, rbp
 	pop rbp
 
 	ret
 
-
-
 ; ***************************************************************************
 
-global printString
-printString:
-	push rbx
-
-	mov rbx, rdi
-	mov rdx, 0
-strCountLoop:
-	cmp byte[rbx], NULL
-	je	strCountDone
-	inc rdx
-	inc rbx
-	jmp strCountLoop
-strCountDone:
-
-	cmp rdx, 0
-	je	prtDone
-
-	mov rax, SYS_write
-	mov rsi, rdi
-	mov rdi, STDOUT
-	syscall
-
-prtDone:
-
-	pop rbx
-	ret

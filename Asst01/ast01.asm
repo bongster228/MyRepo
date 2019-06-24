@@ -150,6 +150,8 @@ pmpt		db	"Enter Text: ", NULL
 
 	;	tstStats Macro variables
 
+	list	db	6,4,3,-1,2,-3,5,7
+
 	wLst	dw	1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 	arr		dd	1,2,3,4,5,6,7,8,10
 	len		dd	10
@@ -295,6 +297,28 @@ strCountDone:
 
 global _start
 _start:
+
+
+
+	;--------------------------------
+
+	mov rbx, list
+	mov rsi ,2
+	mov rax, 4
+	mov rcx, 2
+	cmp al, byte[list+2]
+	jne qLp
+	mov byte[list+4], 6
+qLp:
+	add al, byte[list+rsi]
+	add rsi, 2
+	loop qLp
+	imul byte[rbx+4]
+	inc ax
+	idiv byte[rbx+2]
+	mov bx, word[list]
+
+	;--------------------------------
 
 	; Pass arguments in reverse order
 

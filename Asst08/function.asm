@@ -314,6 +314,7 @@ iMedian:
 	je isEven
 
 	mov eax, dword[rdi+rcx*4]
+	jmp medDone
 
 isEven:
 
@@ -323,7 +324,8 @@ isEven:
 	mov ecx, 2
 	cdq
 	idiv ecx
-
+	
+medDone:
 	pop rbp
 	ret
 
@@ -351,33 +353,36 @@ eStatistic:
 	push rbp
 	mov rbp, rsp
 	sub rsp, 8
-	push r12
+	push r11
 	
+	mov rax, 0
 	call iMedian	;	returns the median into eax
 	
 	mov rcx, rax	;	store median in rcx
-	mov rax, 0		;	running sum
-	mov r12, 0		;	list value
+	mov r11, 0		;	running sum
 
 eStatsSumLp:
-	mov r12d, dword[rdi]
-	sub r12d, ecx
-	add eax, r12d
+	mov eax, dword[rdi]
+	sub eax, ecx
+
+	imul eax		; (area - med)^2
+
+	;	Combine the result
+	mov dword[rbp-8], eax
+	mov dword[rbp-4], edx
+
+	;	Add to running sum
+	add r11, qword[rbp-8]
 
 	add rdi, 4
 	dec esi
 	cmp esi, 0
 	jne eStatsSumLp
 
-	imul eax		;	(sum)^2
-
-	mov dword[rbp-8], eax
-	mov dword[rbp-4], edx
-
-	mov rax, qword[rbp-8]
+	mov rax, r11
 
 
-	pop r12
+	pop r11
 	mov rsp, rbp
 	pop rbp
 
