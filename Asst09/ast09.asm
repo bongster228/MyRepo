@@ -134,16 +134,34 @@ readLp:
 	cmp al, LF				;	check for linefeed
 	je	inputDone
 
+	;	Only skip spaces if they are in the front
+	;	when the input count is zero
+	cmp r13, 0
+	jne	dontSkipSpc
+
+	;	Skip space in front
+	cmp al, 0x20
+	je readLp
+
+dontSkipSpc:
+
+	;	Spaces in the middle are invalid
+	cmp al, NULL
+	je invalidInput
+
 	inc r13					;	inc counter
 	cmp r13, BUFFSIZE		;	check for buffer overflow
-	jge	overflow
+	jge	readLp
 
 	mov byte[r12], al
 	inc r12					;	move index of lineArray
 
 	jmp readLp
 
-inputDone:	
+inputDone:
+
+	cmp r13, BUFFSIZE
+	jge	overflow
 
 	cmp r13, 0
 	je	endInput
@@ -184,48 +202,44 @@ convert:
 
 convertDone:
 
-	;	Check for range 1 ~ 
+	;	Check for range
+	cmp dword[rbp-55], MINNUMBER
+	jb	lowRange
+	cmp dword[rbp-55], MAXNUMBER
+	ja	highRange
 
 	mov r14d, dword[rbp-55]
 	mov qword[rbx], r14
 
 	mov rax, EXIT_SUCCESS
+	jmp end
 
-	pop r14
-	pop r13
-	pop r12
-	pop rcx
-	pop rbx
-	mov rsp, rbp
-	pop rbp
-	ret
+lowRange:
+	mov rax, OUTOFRANGEMIN
+	jmp end
+
+
+highRange:
+	mov rax, OUTOFRANGEMAX
+	jmp end
+
 
 endInput:
-
 	mov rax, ENDOFINPUT
+	jmp end
 
-	pop r14
-	pop r13
-	pop r12
-	pop rbx
-	mov rsp, rbp
-	pop rbp
-	ret
 
 invalidInput:
-
 	mov rax, EXIT_NOSUCCESS
+	jmp end
 
-	pop r14
-	pop r13
-	pop r12
-	pop rbx
-	mov rsp, rbp
-	pop rbp
-	ret
 
 overflow:
 	mov rax, INPUTOVERFLOW
+	jmp end
+
+
+end:
 
 	pop r14
 	pop r13
@@ -408,11 +422,11 @@ cubeStats:
 
 	;	Min
 	mov eax, dword[rdi+rsi*4-4]
-	mov dword[rdx], eax
+	mov dword[rcx], eax
 
 	;	Max
 	mov eax, dword[rdi]
-	mov dword[rcx], eax
+	mov dword[rdx], eax
 
 	;	Sum and Avg
 	mov rax, 0
@@ -426,8 +440,8 @@ sumLp:
 	jne sumLp
 
 	mov dword[r8], eax
-	cdq
-	idiv esi
+	mov edx, 0
+	div esi
 	mov dword[r9], eax
 
 	;	ThreeSum
@@ -437,12 +451,13 @@ sumLp:
 
 threeSumLp:
 	mov eax, dword[rdi]
-	cdq
+	mov ecx, eax			;	temp store number to be added
+	mov edx, 0
 	mov r12d, 3
-	idiv r12d
+	div r12d
 	cmp edx, 0
 	jne notThree
-	add r13d, eax
+	add r13d, ecx
 
 notThree:
 	add rdi, 4

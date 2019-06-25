@@ -1,0 +1,31 @@
+--------------------------------------------------
+CS 218 - Assignment #9
+
+Enter Value (octal): Enter Value (octal): Enter Value (octal): Error, invalid number. Please re-enter.
+Enter Value (octal): Error, invalid number. Please re-enter.
+Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Error, user input exceeded length, input ignored. Please re-enter.
+Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Enter Value (octal): Error, number below minimum value. Please re-enter.
+Enter Value (octal): Error, user input exceeded length, input ignored. Please re-enter.
+Enter Value (octal): Enter Value (octal): Error, number above maximum value. Please re-enter.
+Enter Value (octal): Error, number above maximum value. Please re-enter.
+Enter Value (octal): Error, number above maximum value. Please re-enter.
+Enter Value (octal): --------------------------------------------------
+
+Program Results
+
+Sorted Cube Areas List: 
+     6      24     150     486     600  
+   726    2166    2400    2646    6936  
+ 11094   11094   58806   60000  114264  
+114264  133206  146016  146016  314646  
+483936  536406  1848150  4437600  
+
+  Count       =            24
+  Minimum     =             6
+  Maximum     =       4437600
+  Median      =         34950
+  Sum         =       8431638
+  Average     =        351318
+  Three Sum   =       8431638
+  e-statistic =  23262693013548
+

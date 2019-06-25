@@ -1,5 +1,0 @@
---------------------------------------------------
-CS 218 - Assignment #9
-
-Enter Value (octal): Error, not enough numbers entered.
-Program terminated.

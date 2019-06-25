@@ -1,6 +1,0 @@
---------------------------------------------------
-CS 218 - Assignment #9
-
-Enter Value (octal): Enter Value (octal): Error, number above maximum value. Please re-enter.
-Enter Value (octal): Error, not enough numbers entered.
-Program terminated.
