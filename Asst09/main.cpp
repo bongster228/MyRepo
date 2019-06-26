@@ -124,10 +124,9 @@ int main()
 		cout << endl << "Program Results" << endl << endl;
 
 		cubeAreas(list, len, cAreas);
-
 		bubbleSort(cAreas, len);
-
-		cubeStats(cAreas, len, &lstMin, &lstMax, &lstSum, &lstAve, &lstThreeSum);
+		cubeStats(cAreas, len, &lstMin, &lstMax, &lstSum,
+				&lstAve, &lstThreeSum);
 		lstMed = iMedian(cAreas, len);
 		lstEstat = eStatistic(cAreas, len);
 

@@ -1,0 +1,265 @@
+#!/bin/bash
+# CS 218, assignment #10 test script.
+#
+# ----------
+# Initial checks.
+#	Ensure executable file exists.
+#
+if [ -z $1 ]; then
+	echo "Error, must provide executable file name."
+	exit
+fi
+#
+if [ ! -e $1 ] || [ ! -x $1 ]; then
+	echo "Error, unable to find $1 executable file."
+	exit
+fi
+#
+# ---------------------------------------------------------
+# Define script variables and function
+#
+bolded=`tput bold`
+normal=`tput sgr0`
+#
+pause() {
+	if [ "$1" = "skip" ]; then
+		echo
+	else
+		echo
+		echo -n "Press return to continue"
+		read
+		clear
+	fi
+}
+#
+# ----------
+# Begin tests.
+#
+clear
+# ---------------------------------------------------------
+# Display initial page
+#
+clear
+echo
+echo
+echo ${bolded}Assignment 10 - Error Testing Utility${normal}
+echo
+echo
+echo
+echo "Various tests should generate appropriate error messages."
+echo
+echo
+echo "Note, this utility assumes the program is working or very"
+echo "      close to working.  Testing on an incomplete"
+echo "      program will not be useful."
+echo
+echo
+#
+# ----------------------
+pause $2
+#
+echo
+echo "------------------------------------"
+echo "Error testing -> usage message"
+echo "     $1 should show usage message"
+echo
+echo
+echo
+#
+echo ${bolded}$1${normal}
+./$1
+echo
+echo
+echo
+echo
+echo
+echo
+#
+# ----------------------
+pause $2
+#
+echo "------------------------------------"
+echo "Error testing -> wrong number of command line arguments"
+echo "     $1 should show error message for invalid command line arguments"
+echo
+echo
+#
+echo ${bolded}$1 -it${normal}
+./$1 -it
+echo
+#
+echo ${bolded}$1 -it 177777 -rs 100 extra${normal}
+./$1 -it 177777 -rs 100 extra
+echo
+#
+echo ${bolded}$1 -it 177777 -rs${normal}
+./$1 -it 177777 -rs
+echo
+echo
+echo
+echo
+#
+# ----------------------
+pause $2
+#
+echo "------------------------------------"
+echo "Error testing -> wrong or bad iterations specifier (-it)"
+echo "     $1 should show error message for incorrect iterations specifier"
+echo
+echo
+#
+echo ${bolded}$1 -x 177777 -rs 10${normal}
+./$1 -x 177777 -rs 10
+echo
+#
+echo ${bolded}$1  i 177777 -rs 10${normal}
+./$1  i 177777 -rs 10
+echo
+#
+echo ${bolded}$1 -i 177777 -rs 10${normal}
+./$1 -i 177777 -rs 10
+echo
+#
+echo ${bolded}$1 it 177777 -rs 10${normal}
+./$1 it 177777 -rs 10
+echo
+#
+echo ${bolded}$1  -itt  177777 -rs 10${normal}
+./$1  -itt 177777 -rs 10
+echo
+echo
+#
+# ----------------------
+pause $2
+#
+echo "------------------------------------"
+echo "Error testing -> wrong or bad rotaion speed specifier (-rs)"
+echo "     $1 should show error message for incorrect rotaion speed specifier"
+echo
+echo
+#
+echo ${bolded}$1 -it 177777$ -r 10${normal}
+./$1 -it 177777 -r 10
+echo
+#
+echo ${bolded}$1 -it 177777 rs 10${normal}
+./$1 -it 177777 rs 10
+echo
+#
+echo ${bolded}$1 -it 177777 --rs 10${normal}
+./$1 -it 177777 --rs 10
+echo
+#
+echo ${bolded}$1 -it 177777 rs 10${normal}
+./$1 -it 177777 rs 10
+echo
+#
+echo ${bolded}$1 -it 177777 -rss 10${normal}
+./$1 -it 177777 -rss 10
+echo
+echo
+#
+# ----------------------
+pause $2
+#
+echo "------------------------------------"
+echo "Error testing -> invalid iterations value"
+echo "     $1 should show error message for invalid iterations value"
+echo
+echo
+#
+echo ${bolded}$1 -it 17x777 -rs 10${normal}
+./$1 -it 17x777 -rs 10
+echo
+#
+echo ${bolded}$1  -it 17777-7 -rs 10${normal}
+./$1  -it 17777-7 -rs 10
+echo
+#
+echo ${bolded}$1 -it 17877 -rs 10${normal}
+./$1 -it 17877 -rs 10
+echo
+echo
+echo
+echo
+#
+# ----------------------
+pause $2
+#
+echo "------------------------------------"
+echo "Error testing -> invalid rotation speed value"
+echo "     $1 should show error message for rotation speed value"
+echo
+echo
+#
+echo ${bolded}$1 -it  177777 -rs 1p${normal}
+./$1 -it 177777 -rs 1p
+echo
+#
+echo ${bolded}$1  -it  177777 -rs -1${normal}
+./$1 -it 177777 -rs -1
+echo
+#
+echo ${bolded}$1 -it 177777 -rs 10080${normal}
+./$1 -it 177777 -rs 10080
+echo
+echo
+echo
+echo
+#
+# ----------------------
+pause $2
+#
+echo "------------------------------------"
+echo "Error testing -> invalid iterations range"
+echo "     $1 should show error message for invalid iterations range"
+echo
+echo
+#
+echo ${bolded}$1 -it 200000 -rs 10${normal}
+./$1 -it 200000 -rs 10
+echo
+#
+echo ${bolded}$1  -it  376 -rs 10${normal}
+./$1  -it 376 -rs 10
+echo
+echo
+echo
+echo
+#
+# ----------------------
+pause $2
+#
+echo "------------------------------------"
+echo "Error testing -> invalid rotation speed range"
+echo "     $1 should show error message for rotation speed range"
+echo
+echo
+#
+echo ${bolded}$1 -it 177777 -rs 200000 ${normal}
+./$1 -it 177777 -rs 200000
+echo
+#
+echo ${bolded}$1  -it 177777 -rs 100001${normal}
+./$1  -it 177777 -rs 100001
+echo
+echo
+echo
+echo
+#
+# ----------------------
+pause $2
+#
+# OK, final test is to display image
+#
+echo "------------------------------------"
+echo "Final test -> display"
+echo "     $1 should show the image"
+echo "     Type q or x to terminate"
+echo
+echo
+#
+echo ${bolded}$1  -it  177777 -rs 10${normal}
+./$1  -it 177777 -rs 100
+echo
+
