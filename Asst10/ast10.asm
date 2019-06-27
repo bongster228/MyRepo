@@ -430,6 +430,7 @@ drawChaos:
 	movsd xmm0, qword[rSpeed]
 	movsd xmm1, qword[pi]
 	divsd xmm1, qword[oneEighty]
+	mulsd xmm0, xmm1
 	call cos
 	movsd xmm0, qword[scale]
 	movsd qword[initY], xmm0
@@ -475,7 +476,9 @@ drawChaos:
 	divsd xmm1, qword[oneEighty]
 	mulsd xmm0, xmm1
 
+	;	Error
 	call cos
+	
 	mulsd xmm0, qword[scale]
 	movsd qword[initY+8], xmm0
 
@@ -518,7 +521,11 @@ drawChaos:
 	movsd xmm1, qword[pi]
 	divsd xmm1, qword[oneEighty]
 	mulsd xmm0, xmm1
+
+	;	Error
 	call cos
+	
+	
 	mulsd xmm0, qword[scale]
 	movsd qword[initY+16], xmm0
 
