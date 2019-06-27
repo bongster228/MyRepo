@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 	stat = getIterations(argc, argv, &iterations, &rotateSpeed);
 
 	// Debug call for draw function
-	//	drawChaos();
+		drawChaos();
 
 	if (stat) {
 		glutInit(&argc, argv);

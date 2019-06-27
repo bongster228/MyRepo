@@ -111,19 +111,21 @@ x		dq	0.0
 y		dq	0.0
 
 seed		dq	987123
+seed2		dq	0
 qThree		dq	3
 fTwo		dq	2.0
 
 A_VALUE		equ	9421			; must be prime
 B_VALUE		equ	1
 
+tstVal		dq	0
 
 ; -----
 ;  Local variables for readOctalNum()
 
 BUFFSIZE	equ	50
-intCvt		dd	0
-
+itVal		dd	0
+rsVal		dd 	0
 
 ; ------------------------------------------------------------
 
@@ -165,9 +167,6 @@ extern	cos, sin
 global	printString
 printString:
 	push	rbx
-	push	rsi
-	push	rdi
-	push	rdx
 
 ; -----
 ;  Count characters in string.
@@ -198,9 +197,6 @@ strCountDone:
 ;  String printed, return to calling routine.
 
 prtDone:
-	pop	rdx
-	pop	rdi
-	pop	rsi
 	pop	rbx
 	ret
 
@@ -212,54 +208,81 @@ prtDone:
 
 ; -----
 ;  Arguments:
-;	1) ARGC, double-word, value                 rdi 
-;	2) ARGV, double-word, address               rsi
-;	3) iterations count, double-word, address   rdx
-;	4) rotate spped, double-word, address       rcx
+;	1) ARGC, double-word, value					rsi
+;	2) ARGV, double-word, address				rdi
+;	3) iterations count, double-word, address	rdx
+;	4) rotate spped, double-word, address		rcx
 
 
-	;	Check ARGC
-	;	if argc == 1, display usage and exit. Return false
 
 global getIterations
 getIterations:
 
+	push rbx
 	push r12
 	push r13
+	push r14
+	push r15
 
-	mov rcx, rsi		;	rcx = argv[]
+	mov r14, rdx		;	save 3rd arg
+	mov r15, rcx		;	save 4th arg
 
 	cmp rdi, 1
 	je oneArgc
 
-	;cmp rdi, 5
-	;jne	invalidArgc
+	cmp rdi, 5
+	jne	invalidArgc
+
+	mov rbx, rsi
 
 	;	Check argv[1]	"-it"
-	mov r13, qword[rcx+8]		;	r13 = argv[1]
+	mov r13, qword[rbx+8]		;	r13 = argv[1]
 	cmp dword[r13], 0x0074692d	;	check argv[1] == "-it", NULL in hex
 	jne errItInput
 
 	;	Check argv[2]	-it value min: 225, max: 65535
-	mov rdi, intCvt			;	1st arg to store the converted int
-	mov rsi, qword[rcx+16]	;	2nd arg of the string oct number
+	mov rdi, itVal			;	1st arg to store the converted int
+	mov rsi, qword[rbx+16]	;	2nd arg of the string oct number
 	call readOctalNum
 	
 	;	If input -it value was invalid or out of range, display error
 	cmp rax, TRUE
 	jne	invalidIt
 
-	cmp dword[intCvt], IT_MIN
+	cmp dword[itVal], IT_MIN
 	jb	invalidItRange
 
-	cmp dword[intCvt], IT_MAX
+	cmp dword[itVal], IT_MAX
 	ja	invalidItRange
 
 	;	Check argv[3] for "-rs"
-	mov r13, qword[rcx+24]		;	r13 = argv[3]	
-	cmp dword[r13], 0x73722d	;	"sr-"
+	mov r13, qword[rbx+24]		;	r13 = argv[3]
+	cmp dword[r13], 0x0073722d	;	"sr-"
 	jne	errRsInput
 
+	;	Check argv[4] for validity and rotation speed RS_MAX = 32768
+	mov rdi, rsVal
+	mov rsi, qword[rbx+32]
+	call readOctalNum
+
+	cmp rax, TRUE
+	jne	invalidRsVal
+
+	cmp dword[rsVal], RS_MAX
+	ja	invalidRsRange
+
+
+	;	All inputs are good, return true
+	;	and return values by reference
+	mov rax, TRUE
+	
+	mov ebx, dword[itVal]
+	mov qword[r14], rbx
+
+	mov ebx, dword[rsVal]
+	mov qword[r15], rbx
+	
+	jmp endIteration
 
 oneArgc:
 	mov rdi, errUsage
@@ -297,11 +320,27 @@ errRsInput:
 	mov rax, FALSE
 	jmp endIteration
 
+invalidRsVal:
+	mov rdi, errRSvalue
+	call printString
+	mov rax, FALSE
+	jmp endIteration
+
+invalidRsRange:
+	mov rdi, errRSrange
+	call printString
+	mov rax, FALSE
+	jmp endIteration
+
 endIteration:
 
+	pop r15
+	pop r14
 	pop r13
 	pop r12
+	pop rbx
 	ret
+
 
 
 ; ******************************************************************
@@ -335,6 +374,8 @@ drawChaos:
 ; -----
 ;  Save registers...
 
+	push rbx
+	push r12
 
 ; -----
 ;  Prepare for drawing
@@ -347,7 +388,9 @@ drawChaos:
 ;  Set rotation speed step value.
 ;	rStep = rotationSpeed / scale
 
-
+	cvtsi2sd xmm5, dword[rotateSpeed]
+	divsd	xmm5, qword[rScale]
+	movsd	qword[rStep], xmm5
 
 
 ; -----
@@ -360,25 +403,136 @@ drawChaos:
 ; -----
 ;  Calculate and plot initial points.
 
-
+	;	initX = sin ( ( rSpeed + ( i * dStep ) ) pi / 180 ) * scale
+	;	initY = cos ( ( rSpeed + ( i * dStep ) ) pi / 180 ) * scale
 
 ; -----
 ;  set and plot x[0], y[0]
 
+	;	initX[0]
+	movsd xmm0, qword[rSpeed]
 
+	;	pi / 180
+	movsd xmm1, qword[pi]
+	divsd xmm1, qword[oneEighty]
+
+
+	;	( rSpeed + ( i * dStep ) ) pi / 180 )
+	addsd xmm0, xmm1
+	call sin
+
+	;	sin() * scale
+	mulsd xmm0, qword[scale]
+	movsd qword[initX], xmm0
+
+	
+	;	initY[0]
+	movsd xmm0, qword[rSpeed]
+	movsd xmm1, qword[pi]
+	divsd xmm1, qword[oneEighty]
+	call cos
+	movsd xmm0, qword[scale]
+	movsd qword[initY], xmm0
+
+	;	Plot
+	movsd xmm0, qword[initX]
+	movsd xmm1, qword[initY]
+	call glVertex2d
 
 ; -----
 ;  set and plot x[1], y[1]
 
+	;	initX[1]
+	;	dStep * 1
+	movsd xmm0, qword[dStep]
+	
+	;	rSpeed + dStep
+	addsd xmm0, qword[rSpeed]
 
+	;	xmm1 = pi / 180
+	movsd xmm1, qword[pi]
+	divsd xmm1, qword[oneEighty]
+
+	;	xmm0 = 	( rSpeed + ( i * dStep ) )
+	;	xmm1 = pi / 180
+	;	xmm0 = xmm0 * xmm1
+	mulsd xmm0, xmm1
+	
+	;	sin(xmm0)
+	call sin
+
+	;	xmm0 * scale
+	mulsd xmm0, qword[scale]
+
+	;	initX[1] = xmm0
+	movsd qword[initX+8], xmm0
+
+
+	;	initY[i]
+	movsd xmm0, qword[dStep]
+	addsd xmm0, qword[rSpeed]
+	movsd xmm1, qword[pi]
+	divsd xmm1, qword[oneEighty]
+	mulsd xmm0, xmm1
+
+	call cos
+	mulsd xmm0, qword[scale]
+	movsd qword[initY+8], xmm0
+
+	;	Plot
+	movsd xmm0, qword[initX+8]
+	movsd xmm1, qword[initY+8]
+	call glVertex2d
 
 ; -----
 ;  set and plot x[2], y[2]
 
+	;	initX[2]
+	movsd xmm0, qword[dStep]
 
+	;	i * dStep
+	mulsd xmm0, qword[fTwo]
+
+	;	(i * dStep) + rSpeed 
+	addsd xmm0, qword[rSpeed]
+
+	;	pi / 180
+	movsd xmm1, qword[pi]
+	divsd xmm1, qword[oneEighty]
+
+	;	xmm0 = ( rSpeed + ( i * dStep ) ) pi / 180
+	mulsd xmm0, xmm1
+
+	;	sin(xmm0)
+	call sin
+	mulsd xmm0, qword[scale]
+
+	;	initX[2] = xmm0
+	movsd qword[initX+16], xmm0
+
+
+	;	initY[2]
+	movsd xmm0, qword[dStep]
+	mulsd xmm0, qword[fTwo]
+	addsd xmm0, qword[rSpeed]
+	movsd xmm1, qword[pi]
+	divsd xmm1, qword[oneEighty]
+	mulsd xmm0, xmm1
+	call cos
+	mulsd xmm0, qword[scale]
+	movsd qword[initY+16], xmm0
+
+	;	Plot
+	movsd xmm0, qword[initX+16]
+	movsd xmm1, qword[initY+16]
+	call glVertex2d
 
 ; -----
 ;  Main plot loop.
+
+	mov eax, dword[seed]
+	mov dword[seed2], eax
+	mov r12d, dword[itVal]		; Iteration count
 
 mainPlotLoop:
 
@@ -388,19 +542,90 @@ mainPlotLoop:
 ;	n = s mod 3
 ;  Note, A and B are constants.
 
-
+	mov eax, dword[seed2]
+	mov ebx, A_VALUE
+	mul ebx
+	add eax, B_VALUE
+	mov ecx, 0
+	mov cx, ax
+	mov dword[seed2], ecx
+	mov eax, ecx
+	mov edx, 0
+	div dword[qThree]		; edx = n = 0, 1, 2
 
 ; -----
 ;  Generate next (x,y) point.
 ;	x = x + ( (initX[n] - x) / 2 )
 ;	y = y + ( (initY[n] - y) / 2 )
 
+	;	x = x + ( (initX[n] - x) / 2 )
+	;	xmm0 = initX[n]
+	movsd xmm0, qword[initX+edx*8]
 
+	;	xmm0 = initX[n] - x
+	subsd xmm0, qword[x]
+
+	;	xmm0 = (initX[n] - x) / 2
+	divsd xmm0, qword[fTwo]
+
+	;	xmm0 = x + ( (initX[n] - x) / 2)
+	addsd xmm0, qword[x]
+
+	;	x = xmm0
+	movsd qword[x], xmm0
+
+	;	y = y + ( (initY[n] - y) / 2 )
+	movsd xmm0, qword[initY+edx*8]
+	subsd xmm0, qword[y]
+	divsd xmm0, qword[fTwo]
+	addsd xmm0, qword[y]
+	movsd qword[y], xmm0
+
+	movsd xmm0, qword[x]
+	movsd xmm1, qword[y]
+	call glVertex2d
 
 ; -----
-;  Set draw color
+;  Set draw color (based on n)
+;	0 => red
+;	1 => blue
+;	2 => green
 
+	cmp edx, 0
+	je drawRed
 
+	cmp edx, 1
+	je drawBlue
+
+	cmp edx, 1
+	je drawGreen
+
+drawRed:
+	mov rdi, 255
+	mov rsi, 0
+	mov rdx, 0
+	call glColor3ub
+	jmp drawDone
+
+drawBlue:
+	mov rdi, 0
+	mov rsi, 255
+	mov rdx, 0
+	call glColor3ub
+	jmp drawDone
+
+drawGreen:
+	mov rdi, 0
+	mov rsi, 0
+	mov rdx, 255
+	call glColor3ub
+	jmp drawDone
+
+drawDone:
+
+	dec r12d
+	cmp r12d, 0
+	jne mainPlotLoop
 
 ; -----
 
@@ -414,6 +639,7 @@ mainPlotLoop:
 	call	glutPostRedisplay
 
 	pop	r12
+	pop rbx
 	ret
 
 ; ******************************************************************
