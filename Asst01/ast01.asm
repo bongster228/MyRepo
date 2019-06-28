@@ -148,6 +148,9 @@ pmpt		db	"Enter Text: ", NULL
 	res3	dd	0
 	rem3	dd	0
 
+	flt1	dq	3.14
+	flt2	dq	53.6344
+
 	;	tstStats Macro variables
 
 	list	db	6,4,3,-1,2,-3,5,7

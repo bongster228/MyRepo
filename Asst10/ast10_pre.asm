@@ -93,7 +93,7 @@ red		dd	0			; 0-255
 green		dd	0			; 0-255
 blue		dd	0			; 0-255
 
-pi		dq	3.14159265358979	; constant
+pi		dq	3.14159265358979	;	constant
 oneEighty	dq	180.0
 tmp		dq	0.0
 
@@ -118,9 +118,8 @@ fTwo		dq	2.0
 A_VALUE		equ	9421			; must be prime
 B_VALUE		equ	1
 
-tstVal		dq	1.08
+tstVal		dq	0
 randNum		dd	0
-
 
 ; -----
 ;  Local variables for readOctalNum()
@@ -128,14 +127,8 @@ randNum		dd	0
 BUFFSIZE	equ	50
 itVal		dd	0
 rsVal		dd 	0
-char		db	0
-rSum		dd	0
 
 ; ------------------------------------------------------------
-
-section .bss
-
-inLine		resb	50
 
 section  .text
 
@@ -157,7 +150,7 @@ extern glutPostRedisplay
 ; -----
 ;  c math library funcitons
 
-extern	cos, sin
+extern	sin, cos
 
 
 ; ******************************************************************
@@ -216,15 +209,17 @@ prtDone:
 
 ; -----
 ;  Arguments:
-;	1) ARGC, double-word, value
-;	2) ARGV, double-word, address
-;	3) iterations count, double-word, address
-;	4) rotate spped, double-word, address
+;	1) ARGC, double-word, value					rsi
+;	2) ARGV, double-word, address				rdi
+;	3) iterations count, double-word, address	rdx
+;	4) rotate spped, double-word, address		rcx
+
 
 
 global getIterations
 getIterations:
 
+	push rbp
 	push rbx
 	push r12
 	push r13
@@ -282,12 +277,16 @@ getIterations:
 	;	All inputs are good, return true
 	;	and return values by reference
 	mov rax, TRUE
-	
+
+	mov rbx, 0
+
 	mov ebx, dword[itVal]
-	mov qword[r14], rbx
+	;mov qword[r14], 100
+
+	mov rbx, 2000
 
 	mov ebx, dword[rsVal]
-	mov qword[r15], rbx
+	;mov qword[r15], 200
 
 	;	Update rSpeed from the user input
 	;cvtsi2sd xmm0, rbx
@@ -350,6 +349,7 @@ endIteration:
 	pop r13
 	pop r12
 	pop rbx
+	pop rbp
 	ret
 
 
@@ -400,8 +400,8 @@ drawChaos:
 ;	rStep = rotationSpeed / scale
 
 	cvtsi2sd xmm5, dword[rotateSpeed]
-	divsd xmm5, qword[rScale]
-	movsd qword[rStep], xmm5
+	divsd	xmm5, qword[rScale]
+	movsd	qword[rStep], xmm5
 
 
 ; -----
@@ -417,68 +417,29 @@ drawChaos:
 	;	initX = sin ( ( rSpeed + ( i * dStep ) ) pi / 180 ) * scale
 	;	initY = cos ( ( rSpeed + ( i * dStep ) ) pi / 180 ) * scale
 
+
 ; -----
 ;  set and plot x[0], y[0]
 
 	;	x[0]
-	movsd xmm0, qword[rSpeed]
 
-	;	pi / 180
-	movsd xmm3, qword[pi]
-	divsd xmm3, qword[oneEighty]
-
-	;	rSpeed * (pi/180)
-	mulsd xmm0, xmm3
-
-	call sin
-
-	mulsd xmm0, qword[scale]
-	movsd qword[initX], xmm0
 
 	;	y[0]
-	movsd xmm0, qword[rSpeed]
-	movsd xmm3, qword[pi]
-	divsd xmm3, qword[oneEighty]
-	mulsd xmm0, xmm3
-	call cos
-	mulsd xmm0, qword[scale]
-	movsd qword[initY], xmm0
+
 
 	;	Plot
 	movsd xmm0, qword[initX]
 	movsd xmm1, qword[initY]
-	call glVertex2d 
-
+	call glVertex2d
 
 ; -----
 ;  set and plot x[1], y[1]
 
 	;	x[1]
-	movsd xmm0, qword[dStep]
-	addsd xmm0, qword[rSpeed]
 
-	movsd xmm3, qword[pi]
-	divsd xmm3, qword[oneEighty]
-
-	mulsd xmm0, xmm3
-
-	call sin
-	mulsd xmm0, qword[scale]
-
-	movsd qword[initX+8], xmm0
 
 	;	y[1]
-	movsd xmm0, qword[dStep]
-	addsd xmm0, qword[rSpeed]
-
-	movsd xmm3, qword[pi]
-	divsd xmm3, qword[oneEighty]
-
-	mulsd xmm0, xmm3
-	call sin
-	mulsd xmm0, qword[scale]
-
-	movsd qword[initY+8], xmm0
+		
 
 	;	Plot
 	movsd xmm0, qword[initX+8]
@@ -488,38 +449,13 @@ drawChaos:
 ; -----
 ;  set and plot x[2], y[2]
 
+	movsd qword[tstVal], xmm5
+
 	;	x[2]
 
-	;	rSpeed + ( i * dStep )
-	movsd xmm0, qword[dStep]
-	mulsd xmm0, qword[fTwo]
-	addsd xmm0, qword[rSpeed]
-
-	movsd xmm3, qword[pi]
-	divsd xmm3, qword[oneEighty]
-
-	mulsd xmm0, xmm3
-	call sin
-
-	mulsd xmm0, qword[scale]
-	movsd qword[initX+16], xmm0
 
 	;	y[2]
-	movsd xmm0, qword[dStep]
-	mulsd xmm0, qword[fTwo]
-	addsd xmm0, qword[rSpeed]
 
-
-	movsd xmm3, qword[pi]
-	divsd xmm3, qword[oneEighty]
-
-
-	mulsd xmm0, xmm3
-	call sin
-
-
-	mulsd xmm0, qword[scale]
-	movsd qword[initY+16], xmm0
 
 	;	Plot
 	movsd xmm0, qword[initX+16]
@@ -533,6 +469,7 @@ drawChaos:
 	mov dword[seed2], eax
 	mov r12d, 1					; Iteration count
 
+;	for iterations to 0
 mainPlotLoop:
 
 ; -----
@@ -587,7 +524,7 @@ mainPlotLoop:
 
 ; -----
 ;  Set draw color (based on n)
-;	0 => read
+;	0 => red
 ;	1 => blue
 ;	2 => green
 
@@ -648,10 +585,12 @@ drawDone:
 ;  Update rotation speed.
 ;  Then tell OpenGL to re-draw with new rSpeed value.
 
+	;	Inc rSpeed by rStep
 	movsd xmm0, qword[rSpeed]
-	addsd xmm0, qword[dStep]
-	movsd qword[rSpeed], xmm0
+	movsd xmm1, qword[rStep]
+	addsd xmm0, xmm1
 
+	movsd qword[rSpeed], xmm0
 
 	call	glutPostRedisplay
 
@@ -681,7 +620,9 @@ drawDone:
 global readOctalNum
 readOctalNum:
 
-
+	push rbp
+	mov rbp, rsp
+	sub rsp, 55		;	Allocate local stack memory
 	push rbx
 	push r12
 	push r13
@@ -691,39 +632,53 @@ readOctalNum:
 	mov rbx, rdi			;	save the 1st argument
 	mov r10, rsi			;	save the 2nd argument
 
-	mov r12, inLine			;	char array addr
-	mov r13, 0				;	Counter
+	lea r12, byte[rbp-50]	;	char array
+	mov r13, 0				;	count
+	mov dword[rbp-55], 0	;	running sum variable
+	mov byte[rbp-51], 0
 
 readLp:
 
-	mov al, byte[r10]		;	get the letter
-	inc r10					;	move index
+	mov al, byte[r10]	;	get the input
 
-	cmp al, NULL			;	Check end of string
+	inc r10
+
+	;	Only skip spaces if they are in the front
+	;	when the input count is zero
+	cmp r13, 0
+	jne	dontSkipSpc
+
+	;	Skip space in front
+	cmp al, 0x20
+	je readLp
+
+dontSkipSpc:
+
+	;	Null marks the end of the string
+	cmp al, NULL
 	je inputDone
 
-	inc r13					;	Check for overflow
-	cmp r13, BUFFSIZE
-	jge readLp
+	inc r13					;	inc counter
+	cmp r13, BUFFSIZE		;	check for buffer overflow
+	jge	readLp
 
-	mov byte[r12], al		;	Place the letter in the char arry
-	inc r12
+	mov byte[r12], al
+	inc r12					;	move index of lineArray
 
 	jmp readLp
-
 
 inputDone:
 
 	cmp r13, BUFFSIZE
-	jge overflow
+	jge	overflow
 
-	mov byte[r12], NULL		;	Terminate the string
+	mov byte[r12], NULL		;	terminate the string
 
-	mov r12, inLine			;	Move index to the front of the string
-	mov dword[rSum], 0		;	Running sum
+	lea r12, byte[rbp-50]	;	Address of the string
+	mov dword[rbp-55], 0	;	initialize running sum
 
-;--------
-;	Convert to int
+;-----
+	;	Convert to int
 	mov rax, 0
 	mov r14, 8
 	mov cl, byte[r12]
@@ -732,20 +687,20 @@ convert:
 	cmp cl, NULL
 	je convertDone
 
-	;	Check validity of character
+	;	Check the validity of the character
 	cmp cl, 0x30
 	jb	invalidInput
-	cmp cl,	0x37
-	ja invalidInput
+	cmp cl, 0x37
+	ja	invalidInput
 
 	sub cl, "0"
 	movzx ecx, cl
 
 	;	Mult by 8 and add to running sum
-	mov eax, dword[rSum]
+	mov eax, dword[rbp-55]
 	mul r14d
 	add eax, ecx
-	mov dword[rSum], eax
+	mov dword[rbp-55], eax
 
 	inc r12
 	mov cl, byte[r12]
@@ -753,7 +708,7 @@ convert:
 
 convertDone:
 
-	mov r14d, dword[rSum]
+	mov r14d, dword[rbp-55]
 	mov qword[rbx], r14
 
 	mov rax, TRUE
@@ -776,6 +731,8 @@ end:
 	pop r13
 	pop r12
 	pop rbx
+	mov rsp, rbp
+	pop rbp
 	ret
 
 
