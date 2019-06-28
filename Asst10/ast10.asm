@@ -122,7 +122,7 @@ tstVal1		dq	0
 tstVal2		dq	0
 randNum		dd	0
 zero		dq	0
-
+sinVal		dq	0
 
 ; -----
 ;  Local variables for readOctalNum()
@@ -466,7 +466,7 @@ drawChaos:
 	mulsd xmm0, xmm3
 
 	call sin
-	movsd xmm5, xmm0
+	movsd qword[sinVal], xmm0
 	mulsd xmm0, qword[scale]
 
 	movsd qword[initX+8], xmm0
@@ -479,10 +479,17 @@ drawChaos:
 	divsd xmm3, qword[oneEighty]
 
 	mulsd xmm0, xmm3
+
+
 	call tan
+	
+	movsd xmm5, qword[sinVal]
 	divsd xmm5, xmm0
 
+
 	mulsd xmm5, qword[scale]
+
+	movsd qword[tstVal1], xmm5
 
 	movsd qword[initY+8], xmm5
 
@@ -506,7 +513,7 @@ drawChaos:
 
 	mulsd xmm0, xmm3
 	call sin
-	movsd xmm5 ,xmm0
+	movsd qword[sinVal], xmm0
 
 	mulsd xmm0, qword[scale]
 	movsd qword[initX+16], xmm0
@@ -523,6 +530,9 @@ drawChaos:
 
 	mulsd xmm0, xmm3
 	call tan
+
+	;	xmm5 = cos = tan / sin
+	movsd xmm5, qword[sinVal]
 	divsd xmm5, xmm0
 
 	mulsd xmm5, qword[scale]
@@ -568,7 +578,7 @@ mainPlotLoop:
 
 	;	x = x + ( (initX[n] - x) / 2 )
 	;	xmm0 = initX[n]
-	movsd xmm0, qword[initX+edx*8]
+	movsd xmm0, qword[initX+rdx*8]
 
 	;	xmm0 = initX[n] - x
 	subsd xmm0, qword[x]
@@ -583,13 +593,11 @@ mainPlotLoop:
 	movsd qword[x], xmm0
 
 	;	y = y + ( (initY[n] - y) / 2 )
-	movsd xmm0, qword[initY+edx*8]
+	movsd xmm0, qword[initY+rdx*8]
 	subsd xmm0, qword[y]
 	divsd xmm0, qword[fTwo]
 	addsd xmm0, qword[y]
 	movsd qword[y], xmm0
-
-
 
 ; -----
 ;  Set draw color (based on n)
@@ -641,7 +649,7 @@ drawGreen:
 
 drawDone:
 
-	;	Plot
+	;	Plot x and y
 	movsd xmm0, qword[x]
 	movsd xmm1, qword[y]
 	call glVertex2d
