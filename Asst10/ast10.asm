@@ -387,7 +387,7 @@ drawChaos:
 ; -----
 ;  Save registers...
 
-	push rbx
+	;push rbx
 	push r12	
 
 ; -----
@@ -560,8 +560,8 @@ mainPlotLoop:
 ;  Note, A and B are constants.
 
 	mov eax, dword[seed2]
-	mov ebx, A_VALUE
-	mul ebx
+	mov esi, A_VALUE
+	mul esi
 	add eax, B_VALUE
 	mov ecx, 0
 	mov cx, ax
@@ -676,7 +676,7 @@ drawDone:
 	call	glutPostRedisplay
 
 	pop	r12
-	pop rbx
+	;pop rbx
 	ret
 
 ; ******************************************************************

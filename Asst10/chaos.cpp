@@ -5,6 +5,7 @@
 #include <GL/freeglut.h>
 
 using	namespace	std;
+
 // ----------------------------------------------------------------------
 //  CS 218 -> Assignment #10
 //  Chaos Program.
@@ -61,9 +62,8 @@ int main(int argc, char* argv[])
 
 	stat = getIterations(argc, argv, &iterations, &rotateSpeed);
 
-
 	// Debug call for draw function
-		//drawChaos();
+	//	drawChaos();
 
 	if (stat) {
 		glutInit(&argc, argv);
@@ -86,5 +86,4 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-
 
