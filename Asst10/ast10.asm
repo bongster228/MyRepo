@@ -89,13 +89,13 @@ errRSrange	db	"Error, rotation speed value must be between "
 ; -----
 ;  Local variables for plotChaos() funcction.
 
-red		dd	0			; 0-255
+red			dd	0			; 0-255
 green		dd	0			; 0-255
 blue		dd	0			; 0-255
 
-pi		dq	3.14159265358979	; constant
+pi			dq	3.14159265358979	; constant
 oneEighty	dq	180.0
-tmp		dq	0.0
+tmp			dq	0.0
 
 dStep		dq	120.0			; t step
 scale		dq	500.0			; scale factor
@@ -118,8 +118,10 @@ fTwo		dq	2.0
 A_VALUE		equ	9421			; must be prime
 B_VALUE		equ	1
 
-tstVal		dq	1.08
+tstVal1		dq	0
+tstVal2		dq	0
 randNum		dd	0
+zero		dq	0
 
 
 ; -----
@@ -157,7 +159,7 @@ extern glutPostRedisplay
 ; -----
 ;  c math library funcitons
 
-extern	cos, sin
+extern	sin, cos, tan
 
 
 ; ******************************************************************
@@ -386,7 +388,7 @@ drawChaos:
 ;  Save registers...
 
 	push rbx
-	push r12
+	push r12	
 
 ; -----
 ;  Prepare for drawing
@@ -402,7 +404,6 @@ drawChaos:
 	cvtsi2sd xmm5, dword[rotateSpeed]
 	divsd xmm5, qword[rScale]
 	movsd qword[rStep], xmm5
-
 
 ; -----
 ;  Plot initial points.
@@ -431,7 +432,7 @@ drawChaos:
 	mulsd xmm0, xmm3
 
 	call sin
-
+	movsd xmm5, xmm0
 	mulsd xmm0, qword[scale]
 	movsd qword[initX], xmm0
 
@@ -440,7 +441,9 @@ drawChaos:
 	movsd xmm3, qword[pi]
 	divsd xmm3, qword[oneEighty]
 	mulsd xmm0, xmm3
+
 	call cos
+
 	mulsd xmm0, qword[scale]
 	movsd qword[initY], xmm0
 
@@ -463,6 +466,7 @@ drawChaos:
 	mulsd xmm0, xmm3
 
 	call sin
+	movsd xmm5, xmm0
 	mulsd xmm0, qword[scale]
 
 	movsd qword[initX+8], xmm0
@@ -475,10 +479,12 @@ drawChaos:
 	divsd xmm3, qword[oneEighty]
 
 	mulsd xmm0, xmm3
-	call sin
-	mulsd xmm0, qword[scale]
+	call tan
+	divsd xmm5, xmm0
 
-	movsd qword[initY+8], xmm0
+	mulsd xmm5, qword[scale]
+
+	movsd qword[initY+8], xmm5
 
 	;	Plot
 	movsd xmm0, qword[initX+8]
@@ -500,6 +506,7 @@ drawChaos:
 
 	mulsd xmm0, xmm3
 	call sin
+	movsd xmm5 ,xmm0
 
 	mulsd xmm0, qword[scale]
 	movsd qword[initX+16], xmm0
@@ -515,11 +522,11 @@ drawChaos:
 
 
 	mulsd xmm0, xmm3
-	call sin
+	call tan
+	divsd xmm5, xmm0
 
-
-	mulsd xmm0, qword[scale]
-	movsd qword[initY+16], xmm0
+	mulsd xmm5, qword[scale]
+	movsd qword[initY+16], xmm5
 
 	;	Plot
 	movsd xmm0, qword[initX+16]
@@ -532,6 +539,7 @@ drawChaos:
 	mov eax, dword[seed]		;	eax = seed = 987123
 	mov dword[seed2], eax
 	mov r12d, 1					; Iteration count
+
 
 mainPlotLoop:
 
@@ -581,9 +589,7 @@ mainPlotLoop:
 	addsd xmm0, qword[y]
 	movsd qword[y], xmm0
 
-	movsd xmm0, qword[x]
-	movsd xmm1, qword[y]
-	call glVertex2d
+
 
 ; -----
 ;  Set draw color (based on n)
@@ -635,6 +641,12 @@ drawGreen:
 
 drawDone:
 
+	;	Plot
+	movsd xmm0, qword[x]
+	movsd xmm1, qword[y]
+	call glVertex2d
+
+
 	inc r12d
 	cmp r12d, dword[iterations]
 	jne mainPlotLoop
@@ -649,7 +661,7 @@ drawDone:
 ;  Then tell OpenGL to re-draw with new rSpeed value.
 
 	movsd xmm0, qword[rSpeed]
-	addsd xmm0, qword[dStep]
+	addsd xmm0, qword[rStep]
 	movsd qword[rSpeed], xmm0
 
 
