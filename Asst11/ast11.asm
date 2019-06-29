@@ -646,8 +646,10 @@ showGraph:
     mov r13, rsi            ;   addr of digits array
     mov r14, rdx            ;   display to screen option
 
-    mov rsi, 
-    
+    mov rdi, r12
+    mov rsi, graphHeader
+    call writeString
+
 
 
     pop r14
@@ -707,8 +709,6 @@ writeString:
     cmp rax, 0
     jl  errorOnWrite
 
-    mov rdi, writeDone
-    call printString
     jmp endWrite
 
     errorOnWrite:
