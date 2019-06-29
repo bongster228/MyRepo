@@ -1,0 +1,342 @@
+#!/bin/bash
+# CS 218
+# Assignment #11 test script.
+#
+# ----------
+#  Initial checks.
+#	Ensure executable file exists.
+#
+if [ -z $1 ]; then
+	echo "Error, must provide executable file name."
+	exit
+fi
+#
+if [ ! -e $1 ] || [ ! -x $1 ]; then
+	echo "Error, unable to find $1 executable file."
+	exit
+fi
+#
+if [ ! -e mstr0.txt ] ||
+	[ ! -e mstr1.txt ] ||
+	[ ! -e mstr2.txt ] ||
+	[ ! -e mstr3.txt ] ||
+	[ ! -e books.txt ] ||
+	[ ! -e sunspots.txt ] ||
+	[ ! -e journal.txt ] ||
+	[ ! -e random.txt ]; then
+	echo "Error, unable to find test files."
+	exit
+fi
+#
+# ---------------------------------------------------------
+#  Define script variables and function
+#
+bolded=`tput bold`
+normal=`tput sgr0`
+#
+pause() {
+	if [ "$1" = "skip" ]; then
+		echo
+	else
+		echo
+		echo
+		echo -n "Press return to continue"
+		read
+		echo
+		echo "------------------------"
+	fi
+}
+#
+# ---------------------------------------------------------
+# skip command line arguments tests...
+#
+if [ ! "$2" == "ex" ]; then
+#
+# ----------
+# Begin error tests.
+#
+clear
+echo
+echo "${bolded}CS 218 - Assignment #11 Testing Script${normal}"
+echo
+echo
+echo
+echo
+echo "Note, this utility assumes the program is working or very"
+echo "      close to working.  Testing on an incomplete"
+echo "      program will not be useful."
+echo
+echo "Note, You can type cntl-C to terminate an in-process script."
+echo
+echo
+echo
+pause $2
+clear
+#
+# -----
+#  Initial checks for usage message
+#
+echo "-------------------------------"
+echo "Initial checks for usage message"
+echo
+echo
+echo
+#
+echo
+echo "${bolded}Test -> should show usage message${normal}"
+echo "./"$1""
+./$1
+#
+echo
+echo
+echo
+echo
+pause $2
+clear
+#
+# -----
+#  Initial checks for incorrect argument counts
+#
+echo "-------------------------------"
+echo "Initial checks for incorrect argument counts"
+echo
+echo
+echo
+#echo "${bolded}Test -> should show too few error message${normal}"
+echo "./"$1" -none"
+./$1 -none
+#
+echo
+echo "${bolded}Test -> should show too few error message${normal}"
+echo "./"$1" -d T -i books.txt"
+./$1 -d T -i books.txt
+#
+echo
+echo "${bolded}Test -> should show too many error message${normal}"
+echo "./"$1" -d T -i books.txt -o tmp.txt -e extra"
+./$1 -d T -i books.txt -o tmp.txt -e extra
+#
+echo
+echo
+echo
+echo
+pause $2
+clear
+#
+# -----
+#  Input file argument checks
+#
+echo "-------------------------------"
+echo "Error Testing -> Input File Specifier Check"
+echo
+echo
+echo
+#
+echo "${bolded}Test -> should show input file specifier error message${normal}"
+echo "./"$1"- books.txt -o tmp.txt  -d T"
+./$1 - books.txt -o tmp.txt  -d T
+#
+echo
+echo "${bolded}Test -> should show input file specifier error message${normal}"
+echo "./"$1"-in books.txt -o tmp.txt -d T"
+./$1 -in books.txt -o tmp.txt -d T
+#
+echo
+echo "${bolded}Test -> should show input file specifier error message${normal}"
+echo "./"$1"-x books.txt -o tmp.txt -d T"
+./$1 -x books.txt -o tmp.txt -d T
+#
+echo
+echo
+echo
+echo
+pause $2
+clear
+#
+# -----
+#  Input file argument checks - file
+#
+echo "-------------------------------"
+echo "Error Testing -> Input File Check"
+echo
+echo
+echo
+#
+echo "${bolded}Test -> should show unable to open input file error message${normal}"
+echo "./"$1"-i none.txt -o tmp.txt -d T"
+./$1 -i none.txt -o tmp.txt -d T
+#
+echo
+echo "${bolded}Test -> should show unable to open input file error message${normal}"
+echo "./"$1"-i books.xtx -o tmp.txt -d T"
+./$1 -i books.xtx -o tmp.txt -d T
+#
+echo
+echo
+echo
+echo
+pause $2
+clear
+#
+echo "-------------------------------"
+echo "Error Testing -> Output File Specifier Check"
+echo
+echo
+echo
+#
+echo
+echo "${bolded}Test -> should show output file specifier error message${normal}"
+echo "./"$1"-i books.txt - o -d T"
+./$1 -i books.txt - o -d T
+#
+echo
+echo "${bolded}Test -> should show output file specifier error message${normal}"
+echo "./"$1"-i books.txt -out tmp.txt -d T"
+./$1 -i books.txt -out tmp.txt -d T 
+#
+echo
+echo "${bolded}Test -> should show output file specifier error message${normal}"
+echo "./"$1"-i books.txt -f tmp.txt -d T"
+./$1 -i books.txt -f tmp.txt -d T
+#
+echo
+echo
+echo
+pause $2
+clear
+#
+echo "-------------------------------"
+echo "Error Testing -> Output File Check"
+echo
+echo
+echo
+#
+echo
+echo "${bolded}Test -> should show unable to open output file error message${normal}"
+echo "./"$1"-i books.txt -o /dev/null/test  -d T"
+./$1 -i books.txt -o /dev/null/test  -d T
+#
+echo
+echo
+echo
+echo
+pause $2
+clear
+#
+# -----
+#  Check for display option (T/F)
+#
+echo "-------------------------------"
+echo "Error Testing -> Display Option Specifier Check"
+echo
+echo
+echo
+#
+echo "${bolded}Test -> should show display specifier error message${normal}"
+echo "./"$1"-i books.txt -o tmp.txt  d T"
+./$1 -i books.txt -o tmp.txt  d T
+#
+echo
+echo "${bolded}Test -> should show display specifier error message${normal}"
+echo "./"$1"-i books.txt -o tmp.txt -f F"
+./$1 -i books.txt -o tmp.txt -f F
+#
+echo
+echo "${bolded}Test -> should show display specifier error message${normal}"
+echo "./"$1"-i books.txt -o tmp.txt -ds F"
+./$1 -i books.txt -o tmp.txt -ds F
+#
+echo
+echo
+echo
+echo
+pause $2
+clear
+#
+# -----
+#  Check for display option (T/F)
+#
+echo "-------------------------------"
+echo "Error Testing -> Display Option Check"
+echo
+echo
+echo
+echo
+#
+echo "${bolded}Test -> should show display option error message${normal}"
+echo "./"$1"-i books.txt -o tmp.txt -d NO"
+./$1 -i books.txt -o tmp.txt -d NO
+#
+echo
+echo "${bolded}Test -> should show display option error message${normal}"
+echo "./"$1"-i books.txt -o tmp.txt  -d t"
+./$1 -i books.txt -o tmp.txt  -d t
+#
+echo
+echo
+echo
+echo
+pause $2
+clear
+#
+# ----------
+fi
+#
+# ----------
+# Begin execution tests.
+#
+# ---------------------------------------------------------
+#  initial declarations
+#
+declare -a sources=('books.txt' 'sunspots.txt' 'journal.txt' 'random.txt');
+#
+#
+#
+for cnt in {0..3..1}
+do
+	clear
+	echo "-------------------------------"
+	echo "${bolded}Execution Tests...${normal}"
+	echo
+
+	echo "${bolded}Test #$cnt -> ${sources[$cnt]} (no display)${normal}"
+	echo "./"$1"-i ${sources[$cnt]} -o test1.txt -d F"
+	./$1 -i ${sources[$cnt]} -o test$cnt.txt -d F
+	#
+	if `diff test$cnt.txt mstr$cnt.txt >/dev/null` ; then
+		echo
+		echo "Test #$cnt No Display - Successful"
+	else
+		diff test$cnt.txt mstr$cnt.txt
+	fi
+
+	echo
+	echo
+
+	echo "${bolded}Test #$cnt -> ${sources[$cnt]} (with display)${normal}"
+	echo "./"$1"-i ${sources[$cnt]} -o testD$cnt.txt -d T"
+	./$1 -i ${sources[$cnt]} -o testD$cnt.txt -d T >tmp$cnt.txt
+	#
+	if `diff testD$cnt.txt mstrD$cnt.txt >/dev/null` ; then
+		echo
+		echo "Test #$cnt with Display - Successful"
+	else
+		diff testD$cnt.txt mstrD$cnt.txt
+	fi
+
+	if `diff tmp$cnt.txt mstrO$cnt.txt >/dev/null` ; then
+		echo "Test #$cnt with Display Ouptut - Successful"
+	else
+		diff tmp$cnt.txt mstrO$cnt.txt
+	fi
+
+	echo
+	echo
+	echo
+	echo
+	pause $2
+
+done
+#
+#
+

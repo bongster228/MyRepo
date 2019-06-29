@@ -387,7 +387,6 @@ drawChaos:
 ; -----
 ;  Save registers...
 
-	;push rbx
 	push r12	
 
 ; -----
@@ -676,7 +675,6 @@ drawDone:
 	call	glutPostRedisplay
 
 	pop	r12
-	;pop rbx
 	ret
 
 ; ******************************************************************
