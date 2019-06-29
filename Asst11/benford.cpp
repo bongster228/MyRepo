@@ -39,16 +39,13 @@ int main(int argc, char* argv[])
 //  If command line arguments OK
 //	count the digits
 //	display results
-
 	if (getArguments(argc, argv, &rdFileDesc, &wrFileDesc, &displayToScreen)) {
-
-		cout << "rd: " << rdFileDesc << endl << "wr: " << wrFileDesc <<
-		 endl << "TF: " << displayToScreen << endl;
 
 		countDigits(rdFileDesc, digitCounts);
 
 		showGraph(wrFileDesc, digitCounts, displayToScreen);
 	}
+
 
 
 // --------------------------------------------------------------------

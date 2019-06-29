@@ -103,6 +103,9 @@ nextCharIsFirst	db	TRUE
 skipLineCount	dd	0				; count of lines to skip
 skipCharCount	dd	0				; count of chars to skip
 gotDigit	db	FALSE
+fDigit      db  0
+chr         db  0
+
 
 bfMax		dq	BUFFSIZE
 curr		dq	BUFFSIZE
@@ -122,6 +125,7 @@ SCALE3		equ	2500				; for >= 500,000 and < 1,000,000
 SCALE4		equ	5000				; for >= 1,000,000
 
 scale		dd	SCALE1				; initial scaling factor
+totalCnt    dq 0
 
 weight		dd	3
 
@@ -149,6 +153,7 @@ stars2		db	"                              "
 graphLine3	db	"                     ---------------------------------------------"
 		db	LF, LF, NULL
 
+writeDone   db  "Write Done", NULL
 
 ; -------------------------------------------------------
 
@@ -185,10 +190,9 @@ section	.text
 ;	address of file descriptor, output file     rcx
 ;	address of boolean for display to screen    r8
 
-;   getArguments()-----------------------------
 
-    global getArguments
-    getArguments:
+global getArguments
+getArguments:
 
     push rbx
     push r12
@@ -234,15 +238,23 @@ section	.text
     jne invalidOutputSpecifier
 
     ;   Check for argv[4] if output file could be opened
-    mov rax, SYS_open
+    mov rax, SYS_creat          ;   Create file
+    mov rdi, qword[r12+32]
+    mov rsi, S_IRUSR | S_IWUSR
+    syscall
+
+    cmp rax, 0
+    jl errorOnOutputFile
+
+    mov qword[r14], rax         ;   Save the file descriptor
+
+    mov rax, SYS_open           ;   Check if file can be opened
     mov rdi, qword[r12+32]      ;   argv[4]
     mov rsi, O_RDONLY
     syscall
 
     cmp rax, 0
     jl  errorOnOutputFile
-
-    mov qword[r14], rax
 
     ;   Check for argv[5]
     mov rbx, qword[r12+40]
@@ -336,7 +348,7 @@ section	.text
     pop r13
     pop r12
     pop rbx
-    ret
+ret
 
 ;
 
@@ -364,11 +376,58 @@ section	.text
 
 ;   int2octal(int, &str)
 
-    global int2octal
-    int2octal:
+global int2octal
+int2octal:
 
+    push r12
+    push r13
 
+    mov r12, 8
+    mov rcx, 0              ;   push counter
+    mov r13, rsi            ;   string addr
 
+    ;   Convert and push the values
+    mov rax, rdi
+
+    convertLp:
+    mov rdx, 0
+    div r12
+
+    push rdx
+    inc rcx
+
+    ;   Convert done when the number is 0
+    cmp rax, 0
+    je cvtPushDone
+    
+    jmp convertLp
+    
+    cvtPushDone:
+
+    ;   Pop and convert the values into octal strings
+    mov rdx, 0
+    popLp:
+
+    pop r12
+    dec rcx
+    add r12, "0"
+    mov byte[r13+rdx], r12b       ;   str[rbx]
+
+    inc rdx
+
+    cmp rcx, 0
+    je convertDone
+    jmp popLp
+
+    convertDone:
+
+    mov byte[r13+rdx], NULL
+    mov rax, TRUE
+
+    pop r13
+    pop r12
+
+ret
 ;
 
 
@@ -390,16 +449,174 @@ section	.text
 ;	address for digits array                    rsi
 
 
-;   countDigits (rdFileDesc, digitCounts)
 
-    global countDigits
-    countDigits:
+global countDigits
+countDigits:
+
+    push r12
+    push r13
+
+    mov r12, rdi
+    mov r13, rsi
+
+    mainLp:
+
+    mov rdi, qword[curr]
+    mov rsi, qword[bfMax]
+    ;   if(curr >= bfMax)
+    cmp rdi, rsi
+    jl endMainLp
+    ;       if(wasEof) jmp to exit
+    cmp byte[wasEOF], TRUE
+    je exitCount
+
+    ;   if(error) display mesg, exit
+    ;   Read file, check read error
+    mov rax, SYS_read
+    mov rdi, r12                     ;   File descriptor
+    mov rsi, buff                   ;   Place data here
+    mov rdx, BUFFSIZE
+    syscall
+
+    ;   if(actual == 0) jmp exit
+    ;   rax < 0 means error
+    cmp rax, 0
+    jl  errOnRead
+
+    ;   rax = 0 means no characters read.
+    cmp eax, 0
+    je exitCount
+
+    ;   if(actual < requested)
+    cmp eax, BUFFSIZE
+    jl  reachedEndOfFile
+
+    jmp notEndOfFile
+
+    reachedEndOfFile:
+    ;       wasEof = true
+    ;       bfMax = actual
+    mov byte[wasEOF], TRUE
+    mov dword[bfMax], eax
+
+    notEndOfFile:
+
+    ;    // end if()
+    ;   curr = 0
+    mov qword[curr], 0
+
+    ; // end if()
+    endMainLp:
+    
+    ;   Get chr from buffer
+    ;   ch = buffer[curr]
+    mov rsi, qword[curr]
+    mov dl, byte[buff+rsi]
+    mov byte[chr], dl
 
 
+    ;   Skip 5 lines
+    ;   if(lineCnt < LINEMAX)
+    cmp dword[skipLineCount], SKIP_LINES
+    jge  skipLineDone
+    ;       if(ch == LF) lineCnt++
+        cmp byte[chr], LF
+        jne noLineCnt
+        inc dword[skipLineCount]
+        noLineCnt:
+
+    ;       curr++
+    inc qword[curr]
+    ;   go to mainLp
+    jmp mainLp
+    ;   // end if()
+    skipLineDone:
+
+    ;   Skip 7 characters
+    ;   if(chrCnt < CHRMAX)
+    cmp dword[skipCharCount], SKIP_CHARS
+    jg  skipCharDone
+
+    ;       chrCnt++
+    
+    inc dword[skipCharCount]
+    ;       curr++
+    
+    inc qword[curr]
+    ;       jmp manLp
+    
+    jmp mainLp
+    ;   // end if()
+    skipCharDone:
+
+    ;   Skip the white space in the front
+    cmp byte[chr], 0x20
+    jne skipSpace
+
+    ;   inc curr and go to main loop
+    inc qword[curr]
+    jmp mainLp
+
+    skipSpace:
+
+    ;   if(gotDigit = False)
+    cmp byte[gotDigit], TRUE
+    je notFirstDigit
+    
+    ;   convert firstdigit to int
+    mov rax, 0
+    mov al, byte[chr]
+    sub al, "0"
+    mov byte[fDigit], al
+
+    ;   Increase the count of the digit
+    add dword[r13+rax*4], 1
+
+    inc qword[curr]
+    inc qword[totalCnt]
+
+    ;   gotDigit = true
+    mov byte[gotDigit], TRUE 
+    jmp mainLp
+
+    notFirstDigit:
+
+    ;   if (chr == LF)
+    cmp byte[chr], LF
+    jne notNewLine
+    ;   set skipCharCount = 0
+    mov dword[skipCharCount], 0
+
+    ;   gotDigit = False
+    mov byte[gotDigit], FALSE
+
+    inc qword[curr]
+    jmp mainLp
+
+    notNewLine:
+
+    ;   Ignore all other digits
+    inc qword[curr]
+    jmp mainLp
+
+    errOnRead:
+
+    mov rdi, errFileRead
+    call printString
+    jmp exitCount    
+
+    exitCount:
+
+    mov rdi, qword[totalCnt]
+    mov rsi, num2
+    call int2octal
+
+    pop r13
+    pop r12
 
 
-    ret
-;
+ret
+
 
 ; ======================================================================
 ;  Create graph as per required format.
@@ -411,9 +628,9 @@ section	.text
 
 ; -----
 ;  Arguments passed:
-;	file descriptor, output file - value
-;	address for digits array - address
-;	display to screen option, T or F - value
+;	file descriptor, output file - value        rdi
+;	address for digits array - address          rsi
+;	display to screen option, T or F - value    rdx
 
 
 
@@ -421,6 +638,21 @@ global showGraph
 showGraph:
 
 
+    push r12
+    push r13
+    push r14
+
+    mov r12, rdi            ;   file descriptor
+    mov r13, rsi            ;   addr of digits array
+    mov r14, rdx            ;   display to screen option
+
+    mov rsi, 
+    
+
+
+    pop r14
+    pop r13
+    pop r12
 ret
 
 
@@ -434,13 +666,64 @@ ret
 ;	Use syscall to output characters to file
 
 ;  Arguments:
-;	file descriptor, value
-;	address, string
+;	file descriptor, value              rdi
+;	address, string                     rsi
 ;  Returns:
 ;	nothing
 
 
-;	YOUR CODE GOES HERE
+;   writeString()
+
+global writeString
+writeString:
+
+    push r12
+    push r13
+    push r14
+
+    mov r12, rdi        ;   file descriptor
+    mov r13, rsi        ;   addr of string
+
+    ;   Count the characters in the string
+    mov r14, 0          ;   char counter
+       
+
+    countChar:
+    ;   rsi is addr of the passsed in string
+    cmp byte[rsi], NULL
+    je  charCountDone
+    inc r14
+    inc rsi
+    jmp countChar
+    charCountDone:
+
+
+    mov rax, SYS_write
+    mov rdi, r12
+    mov rsi, r13
+    mov rdx, r14
+    syscall
+
+    cmp rax, 0
+    jl  errorOnWrite
+
+    mov rdi, writeDone
+    call printString
+    jmp endWrite
+
+    errorOnWrite:
+
+    mov rdi, errFileWrite
+    call printString
+    jmp endWrite
+
+    endWrite:
+
+    pop r14
+    pop r13
+    pop r12
+ret
+;
 
 
 

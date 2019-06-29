@@ -1,0 +1,36 @@
+(* Sunspot data collected by Robin McQuinn from *)
+(* http://sidc.oma.be/html/sunspot.html         *)
+
+
+
+data -            58
+data -            63
+data -            70
+data -            56
+data -            85
+data -             4
+data -            10
+data -            11
+data -             6
+data -            12
+data -            14
+data -            17
+data -            47
+data -            49
+data -            76
+data -            61
+data -            51
+data -            60
+data -            61
+data -            70
+data -            91
+data -            81
+data -            72
+data -           107
+data -            99
+data -            94
+data -            91
+data -           101
+data -            89
+data -            90
+
