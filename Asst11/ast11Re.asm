@@ -759,8 +759,6 @@ showGraph:
     cmp esi, dword[starCount]
     jne starLp
 
-    mov dword[stars2+rsi], LF
-
     zeroStars:
 
     mov byte[stars2], "|"
