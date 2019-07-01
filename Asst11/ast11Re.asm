@@ -89,7 +89,7 @@ errOpenOut	db	"Error, can not open output file."
 		db	LF, NULL
 
 rdFileDescriptor    dq  0
-wrFileDescriptor    dq  0
+
 
 ; -----
 ;  Variables for countDigits()
@@ -106,7 +106,6 @@ gotDigit	db	FALSE
 fDigit      db  0
 chr         db  0
 
-
 bfMax		dq	BUFFSIZE
 curr		dq	BUFFSIZE
 
@@ -116,7 +115,6 @@ errFileRead	db	"Error reading input file."
 		db	"Program terminated."
 		db	LF, NULL
 
-; -----
 ; -----
 ;  Variables for showGraph()
 
@@ -139,21 +137,21 @@ graphHeader	db	LF, "CS 218 Benfords Law", LF
 		db	"Test Results", LF, LF, NULL
 
 graphLine1	db	"Total Data Points: "
-tStr1		db	"", LF, LF, NULL
+tStr1		db	"                 ", LF, LF, NULL
 
 DIGITS_SIZE	equ	15
 STARS_SIZE	equ	50
 
 graphLine2	db	"  "				; initial spaces
 index2		db	"x"				; overwriten with #
-		db	" "				; spacing
+		db	"  "				; spacing
 num2		db	"        "		; digit count
 		db	"|"				; pipe
 stars2		db	"                              "
-		db	"                    "
+		db	"                        "
 		db	LF, NULL
 
-graphLine3	db	"                     ---------------------------------------------"
+graphLine3	db	"               ----------------------------------------------"
 		db	LF, LF, NULL
 
 
@@ -186,11 +184,11 @@ section	.text
 
 ; -----
 ;  Arguments passed:
-;	argc                                        rdi
-;	argv                                        rsi
-;	address of file descriptor, input file      rdx
-;	address of file descriptor, output file     rcx
-;	address of boolean for display to screen    r8
+;	argc
+;	argv
+;	address of file descriptor, input file
+;	address of file descriptor, output file
+;	address of boolean for display to screen
 
 
 global getArguments
@@ -354,7 +352,6 @@ getArguments:
     pop rbx
 ret
 
-;
 
 
 ; ======================================================================
@@ -368,9 +365,8 @@ ret
 
 ; -----
 ;  Arguments passed:
-;	1) integer value            rdi
-;	2) string, address          rsi
-
+;	1) integer value
+;	2) string, address
 
 ; -----
 ;  Returns
@@ -378,7 +374,6 @@ ret
 ;	2) bool, TRUE if valid conversion, FALSE for error
 
 
-;   int2octal(int, &str)
 
 global int2octal
 int2octal:
@@ -428,14 +423,11 @@ int2octal:
     ;mov byte[r13+rdx], NULL
     mov rax, TRUE
 
-    mov rdi, tStr1
-    call printString
 
     pop r13
     pop r12
 
 ret
-;
 
 
 
@@ -452,9 +444,8 @@ ret
 
 ; -----
 ;  Arguments passed:
-;	value for input file descriptor             rdi
-;	address for digits array                    rsi
-
+;	value for input file descriptor
+;	address for digits array
 
 
 global countDigits
@@ -622,6 +613,7 @@ countDigits:
 ret
 
 
+
 ; ======================================================================
 ;  Create graph as per required format.
 ;	write graph to file
@@ -683,24 +675,36 @@ showGraph:
 
     scaleDone:
 
-
-
+    
     mov rdi, r12
     mov rsi, graphHeader
     call writeString
 
+    ;   Print header based on option
+    cmp r14, FALSE
+    je noPrintHeader
 
+    mov rdi, graphHeader
+    call printString
+
+    noPrintHeader:
 
     mov rdi, qword[totalCnt]
     mov rsi, tStr1
     call int2octal
 
-
-
     mov rdi, r12
     mov rsi, graphLine1
     call writeString
 
+    ;   Print Total Data Points based on option
+    cmp r14, FALSE
+    je noPrintDataPoints
+
+    mov rdi, graphLine1
+    call printString
+
+    noPrintDataPoints:
 
     ;   Clear num2
     mov rsi, 0
@@ -734,10 +738,20 @@ showGraph:
     div dword[scale]
     cmp eax, 0
     je zeroStars
+
+    ;   Max star count
+    cmp eax, 44
+    jl notMaxStar
+
+    mov eax, 44
+
+    notMaxStar:
+
     mov dword[starCount], eax
+    inc dword[starCount]
 
     ;   Insert Stars
-    mov rsi, 0          ;   counter
+    mov rsi, 0           ;   counter
     starLp:
 
     mov byte[stars2+rsi], "*"
@@ -745,12 +759,24 @@ showGraph:
     cmp esi, dword[starCount]
     jne starLp
 
+    mov dword[stars2+rsi], LF
 
     zeroStars:
+
+    mov byte[stars2], "|"
 
     mov rdi, r12
     mov rsi, graphLine2
     call writeString
+
+    ;   Print stars based on option
+    cmp r14, FALSE
+    je noPrintStars
+
+    mov rdi, graphLine2
+    call printString
+
+    noPrintStars:
 
     ;   Clear the stars
     mov rsi, 0
@@ -785,6 +811,14 @@ showGraph:
     mov rsi, graphLine3
     call writeString
 
+    ;   Print the last line based on option
+    cmp r14, FALSE
+    je  noPrintLast
+
+    mov rdi, graphLine3
+    call printString
+
+    noPrintLast:
 
     pop r14
     pop r13
@@ -802,13 +836,11 @@ ret
 ;	Use syscall to output characters to file
 
 ;  Arguments:
-;	file descriptor, value              rdi
-;	address, string                     rsi
+;	file descriptor, value
+;	address, string
 ;  Returns:
 ;	nothing
 
-
-;   writeString()
 
 global writeString
 writeString:
@@ -857,8 +889,6 @@ writeString:
     pop r13
     pop r12
 ret
-;
-
 
 
 ; ======================================================================
