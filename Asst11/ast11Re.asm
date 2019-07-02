@@ -94,7 +94,7 @@ rdFileDescriptor    dq  0
 ; -----
 ;  Variables for countDigits()
 
-BUFFSIZE	equ	1
+BUFFSIZE	equ	500000
 
 SKIP_LINES	equ	5				; skip first 5 lines
 SKIP_CHARS	equ	6
@@ -121,7 +121,8 @@ errFileRead	db	"Error reading input file."
 SCALE1		equ	100				; for < 100,000
 SCALE2		equ	1000				; for >= 100,000 and < 500,000
 SCALE3		equ	2500				; for >= 500,000 and < 1,000,000 
-SCALE4		equ	5000				; for >= 1,000,000
+SCALE4		equ	6000				; for >= 1,000,000
+SCALE5      equ 12000               ; for >= 2,000,000
 
 scale		dd	SCALE1				; initial scaling factor
 totalCnt    dd  0
@@ -217,7 +218,15 @@ getArguments:
 
     ;   Check for argv[1] for "-i"
     mov rbx, qword[r12+8]
-    cmp word[rbx], 0x692d 
+    cmp byte[rbx], "-"
+    jne invalidInputSpecifier
+    
+    inc rbx
+    cmp byte[rbx], "i"
+    jne invalidInputSpecifier
+
+    inc rbx
+    cmp byte[rbx], NULL
     jne invalidInputSpecifier
 
     ;   Check for argv[2] if input file could be opened
@@ -234,7 +243,15 @@ getArguments:
 
     ;   Check for argv[3] for "-o"
     mov rbx, qword[r12+24]
-    cmp word[rbx], 0x6f2d
+    cmp byte[rbx], "-"
+    jne invalidOutputSpecifier
+
+    inc rbx
+    cmp byte[rbx], "o"
+    jne invalidOutputSpecifier
+
+    inc rbx
+    cmp byte[rbx], NULL
     jne invalidOutputSpecifier
 
     ;   Check for argv[4] if output file could be opened
@@ -256,9 +273,17 @@ getArguments:
     cmp rax, 0
     jl  errorOnOutputFile
 
-    ;   Check for argv[5]
+    ;   Check for argv[5]   "-d"
     mov rbx, qword[r12+40]
-    cmp word[rbx], 0x642d
+    cmp byte[rbx], "-"
+    jne invalidDisplaySpecifier
+
+    inc rbx
+    cmp byte[rbx], "d"
+    jne invalidDisplaySpecifier
+
+    inc rbx
+    cmp byte[rbx], NULL
     jne invalidDisplaySpecifier
 
     ;   Check for argv[6]
@@ -655,7 +680,10 @@ showGraph:
     cmp rax, 1000000
     jl scaleThree
 
-    jmp scaleFour
+    cmp rax, 2000000
+    jl scaleFour
+    
+    jmp scaleFive
 
     scaleOne:
     mov dword[scale], SCALE1
@@ -671,6 +699,10 @@ showGraph:
 
     scaleFour:
     mov dword[scale], SCALE4
+    jmp scaleDone
+
+    scaleFive:
+    mov dword[scale], SCALE5
     jmp scaleDone
 
     scaleDone:

@@ -217,7 +217,15 @@ getArguments:
 
     ;   Check for argv[1] for "-i"
     mov rbx, qword[r12+8]
-    cmp word[rbx], 0x692d 
+    cmp byte[rbx], "-"
+    jne invalidInputSpecifier
+    
+    inc rbx
+    cmp byte[rbx], "i"
+    jne invalidInputSpecifier
+
+    inc rbx
+    cmp byte[rbx], NULL
     jne invalidInputSpecifier
 
     ;   Check for argv[2] if input file could be opened
@@ -234,7 +242,15 @@ getArguments:
 
     ;   Check for argv[3] for "-o"
     mov rbx, qword[r12+24]
-    cmp word[rbx], 0x6f2d
+    cmp byte[rbx], "-"
+    jne invalidOutputSpecifier
+
+    inc rbx
+    cmp byte[rbx], "o"
+    jne invalidOutputSpecifier
+
+    inc rbx
+    cmp byte[rbx], NULL
     jne invalidOutputSpecifier
 
     ;   Check for argv[4] if output file could be opened
@@ -256,9 +272,17 @@ getArguments:
     cmp rax, 0
     jl  errorOnOutputFile
 
-    ;   Check for argv[5]
+    ;   Check for argv[5]   "-d"
     mov rbx, qword[r12+40]
-    cmp word[rbx], 0x642d
+    cmp byte[rbx], "-"
+    jne invalidDisplaySpecifier
+
+    inc rbx
+    cmp byte[rbx], "d"
+    jne invalidDisplaySpecifier
+
+    inc rbx
+    cmp byte[rbx], NULL
     jne invalidDisplaySpecifier
 
     ;   Check for argv[6]
