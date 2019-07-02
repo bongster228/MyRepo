@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# Assignment #11, Part B execution timing script.
+#
+# -----------------------------------------------------
+# Initial checks.
+#	Ensure executable files exists.
+#	Ensure test file exists
+#
+if [ -z $1 ]; then
+	echo "Usage:  ./a11timer <asst11Executable> <ass12Excutable>"
+	exit
+fi
+#
+if [ -z $2 ]; then
+	echo "Error, must provide two executable file names."
+	exit
+fi
+#
+if [ ! -e $1 ] || [ ! -x $1 ]; then
+	echo "Error, unable to find assignment #11 A $1 executable file."
+	exit
+fi
+#
+if [ ! -e $2 ] || [ ! -x $2 ]; then
+	echo "Error, unable to find assignment #11 B $2 executable file."
+	exit
+fi
+#
+if [ ! -e random.txt ]; then
+	echo "Error, unable to find input test files."
+	exit
+fi
+#
+# -----------------------------------------------------
+# Display header
+#
+bolded=`tput bold`
+normal=`tput sgr0`
+echo -e "\\n${bolded}Assignment #11 B -> Timed Executions${normal}\\n"
+#
+# -----------------------------------------------------
+# Original
+#
+echo -e "Starting Large Buffer Timed Executions\\n"
+echo "***************************************" > a11btimes.txt
+echo -e "Large Buffer Timed Executions" >> a11btimes.txt
+echo -e "\\n-------------------" >> a11btimes.txt
+echo "Timed Test #1" >> a11btimes.txt
+(time ./$1 -i random.txt -o tmp.tmp -d F ) 2>> a11btimes.txt
+echo -e "\\n-------------------" >> a11btimes.txt
+echo "Timed Test #2" >> a11btimes.txt
+(time ./$1 -i random.txt -o tmp.tmp -d F ) 2>> a11btimes.txt
+echo -e "\\n-------------------" >> a11btimes.txt
+echo "Timed Test #3" >> a11btimes.txt
+(time ./$1 -i random.txt -o tmp.tmp -d F ) 2>> a11btimes.txt
+#
+# -----------------------------------------------------
+# Original
+#
+echo -e "Starting Small Buffer Timed Executions\\n"
+echo -e "\\n\\n***************************************" >> a11btimes.txt
+echo -e "Small Buffer Timed Executions" >> a11btimes.txt
+echo -e "\\n-------------------" >> a11btimes.txt
+echo "Timed Test #1" >> a11btimes.txt
+(time ./$2 -i random.txt -o tmp.tmp -d F ) 2>> a11btimes.txt
+echo -e "\\n-------------------" >> a11btimes.txt
+echo "Timed Test #2" >> a11btimes.txt
+(time ./$2 -i random.txt -o tmp.tmp -d F ) 2>> a11btimes.txt
+echo -e "\\n-------------------" >> a11btimes.txt
+echo "Timed Test #3" >> a11btimes.txt
+(time ./$2 -i random.txt -o tmp.tmp -d F ) 2>> a11btimes.txt
+echo  >> a11btimes.txt
+echo  >> a11btimes.txt
+#
+# -----------------------------------------------------
+# Done
+#
+rm tmp.tmp
+#
+echo "Timed Tests completed."
+echo "See ${bolded}a11btimes.txt${normal} results."
+echo
+

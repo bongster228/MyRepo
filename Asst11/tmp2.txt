@@ -1,18 +1,1 @@
-
-CS 218 Benfords Law
-Test Results
-
-Total Data Points: 3527             
-
-  0  0        |                                                     
-  1  1726     |*********                                            
-  2  424      |**                                                   
-  3  36       |                                                     
-  4  46       |                                                     
-  5  62       |                                                     
-  6  133      |                                                     
-  7  136      |                                                     
-  8  171      |*                                                    
-  9  305      |*                                                    
-               ----------------------------------------------
-
+Error, invalid input file specifier.

@@ -94,7 +94,7 @@ rdFileDescriptor    dq  0
 ; -----
 ;  Variables for countDigits()
 
-BUFFSIZE	equ	500000
+BUFFSIZE	equ	1
 
 SKIP_LINES	equ	5				; skip first 5 lines
 SKIP_CHARS	equ	6
@@ -148,7 +148,7 @@ index2		db	"x"				; overwriten with #
 num2		db	"        "		; digit count
 		db	"|"				; pipe
 stars2		db	"                              "
-		db	"                        "
+		db	"                     "
 		db	LF, NULL
 
 graphLine3	db	"               ----------------------------------------------"
