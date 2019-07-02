@@ -1,0 +1,335 @@
+     1                                 %line 1+1 ast01.asm
+     2                                 
+     3                                 
+     4                                 
+     5                                 
+     6                                 
+     7                                 [section .data]
+     8                                 
+     9                                 
+    10                                 
+    11                                 
+    12                                 LF equ 10
+    13                                 NULL equ 0
+    14                                 MAXLEN equ 100
+    15                                 
+    16                                 
+    17                                 TRUE equ 1
+    18                                 FALSE equ 0
+    19                                 
+    20                                 EXIT_SUCCESS equ 0
+    21                                 
+    22                                 STDIN equ 0
+    23                                 STDOUT equ 1
+    24                                 STDERR equ 2
+    25                                 
+    26                                 SYS_read equ 0
+    27                                 SYS_write equ 1
+    28                                 SYS_open equ 2
+    29                                 SYS_close equ 3
+    30                                 SYS_fork equ 57
+    31                                 SYS_exit equ 60
+    32                                 SYS_creat equ 85
+    33                                 SYS_time equ 201
+    34                                 
+    35                                 
+    36                                 O_CREAT equ 0x40
+    37                                 O_TRUNC equ 0x200
+    38                                 O_APPEND equ 0x400
+    39                                 
+    40                                 O_RDONLY equ 000000
+    41                                 O_WRONLY equ 000001
+    42                                 O_RDWR equ 000002
+    43                                 
+    44                                 S_IRUSR equ 00400
+    45                                 S_IWUSR equ 00200
+    46                                 S_IXUSR equ 00100
+    47                                 
+    48                                 
+    49 00000000 616243446531323323-    inStr db "abCDe123#$fgG", NULL
+    50 00000000 2466674700         
+    51                                 
+    52 0000000E 546573743200           filenName db "Test2", NULL
+    53                                 
+    54 00000014 00000000               cvtCnt dd 0
+    55 00000018 00000000               ltrCnt dd 0
+    56 0000001C 00000000               digitCnt dd 0
+    57 00000020 00000000               strLen dd 0
+    58                                 
+    59                                 
+    60                                 
+    61                                 
+    62                                 
+    63                                 [section .bss]
+    64                                 
+    65 00000000 <gap>                  newStr resb 100
+    66                                 
+    67                                 
+    68                                 
+    69                                 
+    70                                 [section .text]
+    71                                 
+    72                                 
+    73                                 
+    74                                 
+    75                                 
+    76                                 
+    77                                 
+    78                                 [global makeLower]
+    79                                 makeLower:
+    80                                 
+    81 00000000 55                      push rbp
+    82 00000001 4889E5                  mov rbp, rsp
+    83                                 
+    84 00000004 53                      push rbx
+    85 00000005 4154                    push r12
+    86 00000007 4155                    push r13
+    87                                 
+    88                                 
+    89 00000009 49C7C400000000          mov r12, 0
+    90 00000010 49C7C500000000          mov r13, 0
+    91                                 
+    92                                 
+    93 00000017 4889F3                  mov rbx, rsi
+    94                                 
+    95                                 
+    96                                  chrLp:
+    97 0000001A 468A2C27                mov r13b, byte[rdi+r12]
+    98 0000001E 49830101                add qword[r9], 1
+    99                                 
+   100 00000022 4180FD00                cmp r13b, NULL
+   101 00000026 7460                    je cvtDone
+   102                                 
+   103                                 
+   104 00000028 4180FD30                cmp r13b, "0"
+   105 0000002C 7300                    jae isDigit
+   106                                 
+   107 0000002E EB11                    jmp notDigit
+   108                                 
+   109                                  isDigit:
+   110 00000030 4180FD39                cmp r13b, "9"
+   111 00000034 770B                    ja notDigit
+   112                                 
+   113 00000036 46882C23                mov byte[rbx+r12], r13b
+   114 0000003A 49FFC4                  inc r12
+   115 0000003D 49830001                add qword[r8], 1
+   116 00000041 EBD5                    jmp chrLp
+   117                                 
+   118                                  notDigit:
+   119                                 
+   120 00000043 4180FD41                cmp r13b, "A"
+   121 00000047 7300                    jae isUpper
+   122                                 
+   123 00000049 EB19                    jmp notUpper
+   124                                 
+   125                                  isUpper:
+   126 0000004B 4180FD5A                cmp r13b, "Z"
+   127 0000004F 7713                    ja notUpper
+   128                                 
+   129 00000051 4180C520                add r13b, 32
+   130 00000055 46882C23                mov byte[rbx+r12], r13b
+   131 00000059 49FFC4                  inc r12
+   132 0000005C 48830201                add qword[rdx], 1
+   133 00000060 48830101                add qword[rcx], 1
+   134 00000064 EBB2                    jmp chrLp
+   135                                 
+   136                                  notUpper:
+   137                                 
+   138 00000066 4180FD61                cmp r13b, "a"
+   139 0000006A 7300                    jae isLower
+   140                                 
+   141 0000006C EB11                    jmp notLower
+   142                                 
+   143                                  isLower:
+   144 0000006E 4180FD7A                cmp r13b, "z"
+   145 00000072 770B                    ja notLower
+   146                                 
+   147 00000074 46882C23                mov byte[rbx+r12], r13b
+   148 00000078 49FFC4                  inc r12
+   149 0000007B 48830101                add qword[rcx], 1
+   150 0000007F EB97                    jmp chrLp
+   151                                 
+   152                                  notLower:
+   153                                 
+   154                                 
+   155 00000081 46882C23                mov byte[rbx+r12], r13b
+   156 00000085 49FFC4                  inc r12
+   157 00000088 EB8E                    jmp chrLp
+   158                                 
+   159                                  cvtDone:
+   160 0000008A 42C6042300              mov byte[rbx+r12], NULL
+   161                                 
+   162 0000008F 415D                    pop r13
+   163 00000091 415C                    pop r12
+   164 00000093 5B                      pop rbx
+   165 00000094 4889EC                  mov rsp, rbp
+   166 00000097 5D                      pop rbp
+   167 00000098 C3                     ret
+   168                                 
+   169                                 [global makeUpper]
+   170                                 makeUpper:
+   171                                 
+   172 00000099 4154                    push r12
+   173 0000009B 4155                    push r13
+   174                                 
+   175 0000009D 49C7C400000000          mov r12, 0
+   176 000000A4 49C7C500000000          mov r13, 0
+   177                                 
+   178                                  chrLp2:
+   179 000000AB 468A2C27                mov r13b, byte[rdi+r12]
+   180 000000AF 49830101                add qword[r9], 1
+   181 000000B3 4180FD00                cmp r13b, NULL
+   182 000000B7 7460                    je cvtDone2
+   183                                 
+   184 000000B9 4180FD30                cmp r13b, "0"
+   185 000000BD 7300                    jae isDigit2
+   186 000000BF EB11                    jmp notDigit2
+   187                                 
+   188                                  isDigit2:
+   189 000000C1 4180FD39                cmp r13b, "9"
+   190 000000C5 770B                    ja notDigit2
+   191 000000C7 46882C26                mov byte[rsi+r12], r13b
+   192 000000CB 49FFC4                  inc r12
+   193 000000CE 49830001                add qword[r8], 1
+   194 000000D2 EBD5                    jmp chrLp2
+   195                                 
+   196                                  notDigit2:
+   197 000000D4 4180FD41                cmp r13b, "A"
+   198 000000D8 7300                    jae isUpper2
+   199 000000DA EB11                    jmp notUpper2
+   200                                 
+   201                                  isUpper2:
+   202 000000DC 4180FD5A                cmp r13b, "Z"
+   203 000000E0 770B                    ja notUpper2
+   204 000000E2 46882C26                mov byte[rsi+r12], r13b
+   205 000000E6 49FFC4                  inc r12
+   206 000000E9 48830101                add qword[rcx], 1
+   207 000000ED EBBA                    jmp chrLp2
+   208                                 
+   209                                  notUpper2:
+   210 000000EF 4180FD61                cmp r13b, "a"
+   211 000000F3 7300                    jae isLower2
+   212 000000F5 EB19                    jmp notLower2
+   213                                 
+   214                                  isLower2:
+   215 000000F7 4180FD7A                cmp r13b, "z"
+   216 000000FB 7713                    ja notLower2
+   217 000000FD 4180ED20                sub r13b, 32
+   218 00000101 46882C26                mov byte[rsi+r12], r13b
+   219 00000105 49FFC4                  inc r12
+   220 00000108 48830101                add qword[rcx], 1
+   221 0000010C 48830201                add qword[rdx], 1
+   222 00000110 EB97                    jmp chrLp2
+   223                                 
+   224                                  notLower2:
+   225 00000112 46882C26                mov byte[rsi+r12], r13b
+   226 00000116 49FFC4                  inc r12
+   227 00000119 EB8E                    jmp chrLp2
+   228                                 
+   229                                  cvtDone2:
+   230 0000011B 42C6042600              mov byte[rsi+r12], NULL
+   231                                 
+   232 00000120 415D                    pop r13
+   233 00000122 415C                    pop r12
+   234 00000124 C3                     ret
+   235                                 
+   236                                 
+   237                                 
+   238                                 
+   239                                 
+   240                                 
+   241                                 
+   242                                 
+   243                                 [global writeLowerStr]
+   244                                 writeLowerStr:
+   245                                 
+   246 00000125 55                      push rbp
+   247 00000126 4889E5                  mov rbp, rsp
+   248 00000129 53                      push rbx
+   249 0000012A 4154                    push r12
+   250 0000012C 4155                    push r13
+   251 0000012E 4156                    push r14
+   252 00000130 4157                    push r15
+   253                                 
+   254 00000132 4989FC                  mov r12, rdi
+   255 00000135 4989F5                  mov r13, rsi
+   256 00000138 4989D6                  mov r14, rdx
+   257 0000013B 4989CF                  mov r15, rcx
+   258 0000013E 4C89C3                  mov rbx, r8
+   259 00000141 4D89CA                  mov r10, r9
+   260                                 
+   261 00000144 4C89EF                  mov rdi, r13
+   262 00000147 4C89F6                  mov rsi, r14
+   263 0000014A 4C89FA                  mov rdx, r15
+   264 0000014D 4889D9                  mov rcx, rbx
+   265 00000150 4D89D0                  mov r8, r10
+   266 00000153 4C8B4D10                mov r9, qword[rbp+16]
+   267 00000157 E89FFEFFFF              call makeLower
+   268                                 
+   269                                 
+   270                                 
+   271 0000015C 4C89EE                  mov rsi, r13
+   272 0000015F 4C89F2                  mov rdx, r14
+   273 00000162 4C89F9                  mov rcx, r15
+   274 00000165 4989D8                  mov r8, rbx
+   275 00000168 4D89D1                  mov r9, r10
+   276                                 
+   277                                 
+   278 0000016B 4C89EF                  mov rdi, r13
+   279 0000016E 4C89F6                  mov rsi, r14
+   280                                 
+   281 00000171 E885FEFFFF              call makeLower
+   282                                 
+   283                                 
+   284                                 
+   285 00000176 415F                    pop r15
+   286 00000178 415E                    pop r14
+   287 0000017A 415D                    pop r13
+   288 0000017C 415C                    pop r12
+   289 0000017E 5B                      pop rbx
+   290 0000017F 4889EC                  mov rsp, rbp
+   291 00000182 5D                      pop rbp
+   292                                 
+   293 00000183 C3                     ret
+   294                                 
+   295                                 
+   296                                 
+   297                                 [global _start]
+   298                                 _start:
+   299                                 
+   300                                 
+   301                                 
+   302                                 
+   303                                 
+   304                                 
+   305                                 
+   306                                 
+   307                                 
+   308                                 
+   309                                 
+   310                                 
+   311                                 
+   312 00000184 48C7C7[00000000]       mov rdi, filenName
+   313 0000018B 48C7C6[00000000]       mov rsi, inStr
+   314 00000192 48C7C2[00000000]       mov rdx, newStr
+   315 00000199 48C7C1[00000000]       mov rcx, cvtCnt
+   316 000001A0 49C7C0[00000000]       mov r8, ltrCnt
+   317 000001A7 49C7C1[00000000]       mov r9, digitCnt
+   318 000001AE 68[00000000]           push strLen
+   319 000001B3 E868FFFFFF             call writeLowerStr
+   320 000001B8 4883C408               add rsp, 8
+   321                                 
+   322                                 
+   323                                 
+   324                                 
+   325                                 
+   326                                 
+   327                                 
+   328                                 
+   329                                 
+   330                                 
+   331                                 last:
+   332 000001BC 48C7C03C000000          mov rax, SYS_exit
+   333 000001C3 48C7C700000000          mov rdi, EXIT_SUCCESS
+   334 000001CA 0F05                    syscall
+   335                                 

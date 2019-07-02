@@ -121,7 +121,8 @@ errFileRead	db	"Error reading input file."
 SCALE1		equ	100				; for < 100,000
 SCALE2		equ	1000				; for >= 100,000 and < 500,000
 SCALE3		equ	2500				; for >= 500,000 and < 1,000,000 
-SCALE4		equ	5000				; for >= 1,000,000
+SCALE4		equ	6000				; for >= 1,000,000
+SCALE5      equ 12000               ; for >= 2,000,000
 
 scale		dd	SCALE1				; initial scaling factor
 totalCnt    dd  0
@@ -679,7 +680,10 @@ showGraph:
     cmp rax, 1000000
     jl scaleThree
 
-    jmp scaleFour
+    cmp rax, 2000000
+    jl scaleFour
+    
+    jmp scaleFive
 
     scaleOne:
     mov dword[scale], SCALE1
@@ -695,6 +699,10 @@ showGraph:
 
     scaleFour:
     mov dword[scale], SCALE4
+    jmp scaleDone
+
+    scaleFive:
+    mov dword[scale], SCALE5
     jmp scaleDone
 
     scaleDone:
