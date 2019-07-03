@@ -257,12 +257,12 @@ primeCounter:
 	primeCountLp:
 
 	;	Get the number
-	;call spinLock
+	call spinLock
 
 	mov rbx, qword[iCounter]
 	add qword[iCounter], 1
 
-	;call spinUnlock
+	call spinUnlock
 
 	cmp rbx, qword[primeLimit]
 	jge	primeCountDone
@@ -273,7 +273,7 @@ primeCounter:
 	cmp rax, FALSE			;	Don't increment count if not prime
 	je primeCountLp
 
-	inc qword[primeCount]
+	lock inc qword[primeCount]
 
 	jmp primeCountLp
 
