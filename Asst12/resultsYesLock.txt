@@ -1,0 +1,16 @@
+*******************************************
+[1mPrimes Program[0m
+
+--------------------------------------
+Start Prime Count
+Prime Count: 2422003
+
+Completed.
+*******************************************
+[1mPrimes Program[0m
+
+--------------------------------------
+Start Prime Count
+Prime Count: 25764657
+
+Completed.
