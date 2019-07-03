@@ -3,6 +3,14 @@
 
 --------------------------------------
 Start Prime Count
-Prime Count: 2422003
+Prime Count: 2471317
+
+Completed.
+*******************************************
+[1mPrimes Program[0m
+
+--------------------------------------
+Start Prime Count
+Prime Count: 26225361
 
 Completed.
