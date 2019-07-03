@@ -1,3 +1,4 @@
+; Bong Lee
 ; CS 218
 ; Assignment #12
 ; Threading program, provided template
@@ -120,10 +121,6 @@ main:
 ; -----
 ;  Check command line arguments
 
-	mov rdi, 12345
-	mov rsi, tmpString
-	call intToOctal
-
 	mov	rdi, rdi			; argc
 	mov	rsi, rsi			; argv
 	mov	rdx, isSequential
@@ -132,8 +129,6 @@ main:
 
 	cmp	rax, TRUE
 	jne	progDone
-
-
 
 ; -----
 ;  Initial actions:
@@ -150,18 +145,70 @@ main:
 ;  if sequntial, start 1 thread
 ;  if parallel, start 3 threads
 
+	cmp byte[isSequential], FALSE
+	je parallel
 
-;	YOUR CODE GOES HERE
+;	Sequetial(1 Thread)
 
+	mov rdi, pthreadID0
+	mov rsi, NULL
+	mov rdx, primeCounter
+	mov rcx, NULL
+	call pthread_create
 
 
 ;  Wait for thread(s) to complete.
 ;	pthread_join (pthreadID0, NULL);
 
 
-;	YOUR CODE GOES HERE
+	mov rdi, qword[pthreadID0]
+	mov rsi, NULL
+	call pthread_join
 
+	jmp showFinalResults
 
+;	Parallel
+	parallel:
+
+	mov qword[iCounter], 0
+
+	;	Create thread 1
+	mov rdi, pthreadID0
+	mov rsi, NULL
+	mov rdx, primeCounter
+	mov rcx, NULL
+	call pthread_create
+
+	;	Create thread 2
+	mov rdi, pthreadID1
+	mov rsi, NULL
+	mov rdx, primeCounter
+	mov rcx, NULL
+	call pthread_create
+
+	;	Create thread 3
+	mov rdi, pthreadID2
+	mov rsi, NULL
+	mov rdx, primeCounter
+	mov rcx, NULL
+	call pthread_create
+
+;	Join threads
+
+	;	Join thread 1
+	mov rdi, qword[pthreadID0]
+	mov rsi, NULL
+	call pthread_join
+
+	;	Join thread 2
+	mov rdi, qword[pthreadID1]
+	mov rsi, NULL
+	call pthread_join
+
+	;	Join thread 3
+	mov rdi, qword[pthreadID2]
+	mov rsi, NULL
+	call pthread_join
 
 ; -----
 ;  Display final count
@@ -207,10 +254,34 @@ global primeCounter
 primeCounter:
 	push	rbx
 
+	primeCountLp:
 
-;	YOUR CODE GOES HERE
+	;	Get the number
+	;call spinLock
 
+	mov rbx, qword[iCounter]
+	add qword[iCounter], 1
 
+	;call spinUnlock
+
+	cmp rbx, qword[primeLimit]
+	jge	primeCountDone
+
+	;	Check for prime
+	mov rdi, rbx
+	call isPrime
+	cmp rax, FALSE			;	Don't increment count if not prime
+	je primeCountLp
+
+	inc qword[primeCount]
+
+	jmp primeCountLp
+
+	primeCountDone:
+	
+	pop 	rbx
+
+ret
 
 ; ******************************************************************
 ;  Mutex lock
@@ -411,7 +482,7 @@ intToOctal:
 	toOctLpDone:
 
 	;	Pop the digits into string
-	mov r8, 0		; string index counter
+	mov r8, 0		; stringcd  index counter
 	popOctLp:
 
 	pop rax

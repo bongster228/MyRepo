@@ -1,0 +1,62 @@
+***************************************
+Sequential Timed Executions
+
+-------------------
+Timed Test #1
+
+real	0m9.599s
+user	0m9.574s
+sys	0m0.016s
+
+-------------------
+Timed Test #2
+
+real	0m9.895s
+user	0m9.893s
+sys	0m0.000s
+
+-------------------
+Timed Test #3
+
+real	3m39.105s
+user	3m39.039s
+sys	0m0.016s
+
+-------------------
+Timed Test #3
+
+real	3m45.171s
+user	3m45.016s
+sys	0m0.072s
+
+
+***************************************
+Parallel Timed Executions
+
+-------------------
+Timed Test #1
+
+real	0m3.311s
+user	0m9.919s
+sys	0m0.000s
+
+-------------------
+Timed Test #2
+
+real	0m3.352s
+user	0m10.035s
+sys	0m0.004s
+
+-------------------
+Timed Test #3
+
+real	1m17.643s
+user	3m52.508s
+sys	0m0.148s
+
+-------------------
+Timed Test #3
+
+real	1m18.549s
+user	3m55.437s
+sys	0m0.064s

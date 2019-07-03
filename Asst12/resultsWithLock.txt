@@ -1,0 +1,10 @@
+
+[1mAssignment #12 -> Timed Executions(B[m
+
+Starting Sequential Timed Executions
+
+Starting Parellel Timed Executions
+
+Timed Tests completed.
+See [1ma12times.txt(B[m results.
+
